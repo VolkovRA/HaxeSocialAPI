@@ -3,7 +3,7 @@
 Описание
 ------------------------------
 
-Интерфейс и его реализация для различных API социальных сетей на Haxe.
+Единый интерфейс API для разных социальных сетей.
 Дополняется по мере личной необходимости.
 
 Пример использования
@@ -35,3 +35,29 @@ class Main
 	}
 }
 ```
+
+Подключение в Haxe
+------------------------------
+
+1. Установите haxelib, чтобы можно было использовать библиотеки Haxe.
+2. Выполните в терминале команду, чтобы установить библиотеку SocialAPI глобально себе на локальную машину:
+```
+haxelib git SocialAPI https://github.com/VolkovRA/HaxeSocialAPI master
+```
+Синтаксис команды:
+```
+haxelib git [project-name] [git-clone-path] [branch]
+haxelib git minject https://github.com/massiveinteractive/minject.git         # Use HTTP git path.
+haxelib git minject git@github.com:massiveinteractive/minject.git             # Use SSH git path.
+haxelib git minject git@github.com:massiveinteractive/minject.git v2          # Checkout branch or tag `v2`.
+```
+3. Добавьте в свой проект библиотеку SocialAPI, чтобы использовать её в коде. Если вы используете HaxeDevelop, то просто добавьте в файл .hxproj запись:
+```
+<haxelib>
+	<library name="SocialAPI" />
+</haxelib>
+```
+
+Смотрите дополнительную информацию:
+ * [Документация Haxelib](https://lib.haxe.org/documentation/using-haxelib/ "Using Haxelib")
+ * [Документация HaxeDevelop](https://haxedevelop.org/configure-haxe.html "Configure Haxe")
