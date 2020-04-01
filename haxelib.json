@@ -1,0 +1,11 @@
+{
+	"name": "SocialAPI",
+	"url": "https://github.com/VolkovRA/HaxeSocialAPI/blob/master/README.md",
+	"license": "MIT",
+	"tags": ["social", "social network", "vk", "vkontakte"],
+	"description": "Several social networks api as one interface",
+	"version": "0.0.1",
+	"releasenote": "Active development",
+	"contributors": ["VolkovRA"],
+	"classPath": "src"
+}
