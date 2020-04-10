@@ -7,5 +7,5 @@
 	"version": "0.0.1",
 	"releasenote": "Active develop",
 	"contributors": ["VolkovRA"],
-	"classPath": "lib/social"
+	"classPath": "lib"
 }
