@@ -1,12 +1,12 @@
 package social;
 
-import js.Error;
+import js.lib.Error;
 
 /**
  * Ошибка интерфейса соц. сети.
  * @author VolkovRA
  */
-class SocialError extends js.Error
+class SocialError extends Error
 {
 	/**
 	 * Создать ошибку интерфейса соц. сети.
