@@ -21,6 +21,12 @@ interface ISocialNetwork
 	var type(default, null):SocialNetworkType;
 	
 	/**
+	 * Название социальной сети.
+	 * Не может быть null.
+	 */
+	var title(default, null):String;
+	
+	/**
 	 * Статус инициализации.
 	 * Равен true, если этот интерфейс API был проинициализирован.
 	 */
