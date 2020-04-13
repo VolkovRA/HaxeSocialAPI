@@ -16,11 +16,7 @@ class Utils
 	 * @return	Новая строка, представляющая собой незакодированную версию данного унифицированного идентификатора ресурса.
 	 */
 	static public inline function decodeURI(uri:String):String {
-		#if js
-			return Syntax.code("decodeURI({0})", uri);
-		#else
-			return null;
-		#end
+		return Syntax.code("decodeURI({0})", uri);
 	}
 	
 	/**
@@ -32,11 +28,7 @@ class Utils
 	 * @return	Новая строка, представляющая собой строку-параметр, закодированную в виде универсального идентификатора ресурса (URI).
 	 */
 	static public inline function encodeURI(uri:String):String {
-		#if js
-			return Syntax.code("encodeURI({0})", uri);
-		#else
-			return null;
-		#end
+		return Syntax.code("encodeURI({0})", uri);
 	}
 	
 	/**
@@ -47,10 +39,6 @@ class Utils
 	 * @return	Возвращает целое число или NaN, если преобразование не удалось.
 	 */
 	static public inline function parseInt(str:String):Int {
-		#if js
-			return Syntax.code("parseInt({0})", str);
-		#else
-			return null;
-		#end
+		return Syntax.code("parseInt({0})", str);
 	}
 }

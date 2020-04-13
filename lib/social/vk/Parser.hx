@@ -5,18 +5,21 @@ import social.vk.IFrameParams;
 
 /**
  * Парсер данных VK.
- * Статический класс.
  * @author VolkovRA
  */
 class Parser 
 {
+	/// Создать парсер VK.
+	public function new() {
+	}
+	
 	/**
 	 * Распарсить параметры запроса iframe.
 	 * Считывает строку и возвращает данные, которые передал VK.
 	 * @param	str Строка запроса с параметрами от VK. (То, что после символа "?" в URL)
 	 * @return	Объект параметров VK.
 	 */
-	static public function readIFrameParams(str:String):IFrameParams {
+	public function readIFrameParams(str:String):IFrameParams {
 		if (str == null)
 			return {};
 		
