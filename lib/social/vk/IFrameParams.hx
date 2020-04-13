@@ -11,96 +11,106 @@ typedef IFrameParams =
 	/**
 	 * URL сервиса API, по которому необходимо осуществлять запросы.
 	 */
-	var api_url:String;
+	@:optional var api_url:String;
 	
 	/**
 	 * Идентификатор запущенного приложения.
 	 */
-	var api_id:Int;
+	@:optional var api_id:Int;
 	
 	/**
 	 * Битовая маска настроек прав доступа текущего пользователя в приложении.
 	 */
-	var api_settings:UserPermissions;
+	@:optional var api_settings:UserPermissions;
 	
 	/**
 	 * Идентификатор пользователя, который запустил приложение.
 	 */
-	var viewer_id:Int;
+	@:optional var viewer_id:Int;
 	
 	/**
 	 * Тип пользователя, который просматривает приложение.
 	 */
-	var viewer_type:ViewerType;
+	@:optional var viewer_type:ViewerType;
 	
 	/**
 	 * Идентификатор сессии для осуществления запросов к API.
 	 * Устаревший параметр.
 	 */
-	var sid:String;
+	@:optional var sid:String;
 	
 	/**
 	 * Секрет, необходимый для подписи запросов к API.
 	 * Устаревший параметр.
 	 */
-	var secret:String;
+	@:optional var secret:String;
 	
 	/**
 	 * Ключ доступа для вызова методов API по классической схеме.
 	 */
-	var access_token:UserAccessToken;
+	@:optional var access_token:UserAccessToken;
 	
 	/**
 	 * Идентификатор пользователя, со страницы которого было запущено приложение.
 	 * Если приложение запущено не со страницы пользователя, содержит 0.
 	 */
-	var user_id:Int;
+	@:optional var user_id:Int;
 	
 	/**
 	 * Идентификатор сообщества, со страницы которого было запущено приложение.
 	 * Если приложение запущено не со страницы сообщества, содержит 0.
 	 */
-	var group_id:Int;
+	@:optional var group_id:Int;
 	
 	/**
 	 * Если пользователь установил приложение, содержит 1, иначе — 0.
 	 */
-	var is_app_user:Int;
+	@:optional var is_app_user:Int;
 	
 	/**
 	 * Ключ, необходимый для авторизации пользователя на стороннем сервере.
 	 */
-	var auth_key:AuthKey;
+	@:optional var auth_key:AuthKey;
 	
 	/**
 	 * Идентификатор языка пользователя, просматривающего приложение.
 	 */
-	var language:Language;
+	@:optional var language:Language;
 	
 	/**
 	 * Идентификатор языка, которым можно заменить язык пользователя.
 	 * Возвращается для неофициальных языковых версий.
 	 */
-	var parent_language:Language;
+	@:optional var parent_language:Language;
 	
 	/**
 	 * Если пользователем используется защищенное соединение – 1, иначе — 0.
 	 */
-	var is_secure:Int;
+	@:optional var is_secure:Int;
 	
 	/**
 	 * Результат первого запроса к API, который выполняется при загрузке приложения.
 	 */
-	var api_result:String;
+	@:optional var api_result:String;
 	
 	/**
 	 * Обозначение места, откуда пользователь перешёл в приложение.
 	 */
-	var referrer:Referrer;
+	@:optional var referrer:Referrer;
 	
 	/**
 	 * Хэш запроса.
 	 * Данные после символа # в строке адреса.
 	 */
-	var hash:String;
+	@:optional var hash:String;
+	
+	/**
+	 * Служебные параметры.
+	 */
+	@:optional var lc_name:String;
+	
+	/**
+	 * Служебные параметры.
+	 */
+	@:optional var ads_app_id:String;
 }

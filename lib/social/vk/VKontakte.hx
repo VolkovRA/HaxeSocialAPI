@@ -33,15 +33,4 @@ class VKontakte implements ISocialNetwork
 		if (callback != null)
 			callback(null);
 	}
-	
-	/**
-	 * Распарсить параметры запроса iframe VK.
-	 * Считывает строку и возвращает данные, которые передал VK.
-	 * @param	str Строка запроса с параметрами от VK. (То, что после символа "?" в URL)
-	 * @return	Объект параметров VK.
-	 */
-	static public function parseIFrameParams(str:String):IFrameParams {
-		
-		return null;
-	}
 }
