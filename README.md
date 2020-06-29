@@ -40,9 +40,9 @@ class Main
 ------------------------------
 
 1. Установите haxelib, чтобы можно было использовать библиотеки Haxe.
-2. Выполните в терминале команду, чтобы установить библиотеку SocialAPI глобально себе на локальную машину:
+2. Выполните в терминале команду, чтобы установить библиотеку social глобально себе на локальную машину:
 ```
-haxelib git SocialAPI https://github.com/VolkovRA/HaxeSocialAPI master
+haxelib git social https://github.com/VolkovRA/HaxeSocialAPI master
 ```
 Синтаксис команды:
 ```
@@ -51,10 +51,10 @@ haxelib git minject https://github.com/massiveinteractive/minject.git         # 
 haxelib git minject git@github.com:massiveinteractive/minject.git             # Use SSH git path.
 haxelib git minject git@github.com:massiveinteractive/minject.git v2          # Checkout branch or tag `v2`.
 ```
-3. Добавьте в свой проект библиотеку SocialAPI, чтобы использовать её в коде. Если вы используете HaxeDevelop, то просто добавьте в файл .hxproj запись:
+3. Добавьте в свой проект библиотеку social, чтобы использовать её в коде. Если вы используете HaxeDevelop, то просто добавьте в файл .hxproj запись:
 ```
 <haxelib>
-	<library name="SocialAPI" />
+	<library name="social" />
 </haxelib>
 ```
 
