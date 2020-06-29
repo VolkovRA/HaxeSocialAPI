@@ -3,16 +3,15 @@ package social;
 import js.lib.Error;
 
 /**
- * Ошибка интерфейса соц. сети.
- * @author VolkovRA
+ * Ошибка интерфейса социальной сети.
  */
 class SocialError extends Error
 {
-	/**
-	 * Создать ошибку интерфейса соц. сети.
-	 * @param	message Сообщение.
-	 */
-	public function new(?message:String) {
-		super(message);
-	}
+    /**
+     * Создать ошибку.
+     * @param message Сообщение.
+     */
+    public function new(?message:String) {
+        super(message);
+    }
 }
