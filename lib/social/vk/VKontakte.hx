@@ -1,97 +1,197 @@
 package social.vk;
 
+import haxe.DynamicAccess;
+import js.Browser;
+import js.lib.Error;
+import js.html.ScriptElement;
+import js.html.Event;
+import loader.Balancer;
 import social.ISocialNetwork;
-import social.SocialError;
 import social.SocialNetworkType;
-#if nodejs
-import js.node.Crypto;			
-#end
+import social.task.IGetUsersTask;
+import social.task.IGetFriendsTask;
+import social.vk.task.GetUsersTask;
+import social.vk.task.GetFriendsTask;
+import social.vk.enums.UserPermissions;
+import social.vk.sdk.SDK;
 
 /**
- * Реализация интерфейса для **ВКонтакте**.
+ * Реализация интерфейса для VK.
  */
 class VKontakte implements ISocialNetwork 
 {
+    static public inline var API_VERSION:String         = "5.120"; // 03.07.2020
+    static public inline var API_URL:String             = "https://api.vk.com/method/";
+    static public inline var SDK_URL:String             = "https://vk.com/js/api/xd_connection.js?2";
+
+    // Приват
+    static private var tagSdk:ScriptElement;
+    private var onComplete:Error->Void;
+
     /**
-     * Создать объект.
+     * Создать интерфейс VK.
      */
     public function new() {
     }
 
 
 
-    ////////////////////
-    //   КОМПОЗИЦИЯ   //
-    ////////////////////
+    ///////////////////
+    //   ИНТЕРФЕЙС   //
+    ///////////////////
 
-    /**
-     * Парсер данных VK.
-     */
-    public var parser(default, null):Parser = new Parser();
+    public var title(default, null):String              = "VKontakte";
+    public var type(default, null):SocialNetworkType    = SocialNetworkType.VK;
+    public var balancer(default, null):Balancer         = new Balancer(3);
+    public var isInit(default, null):Bool               = false;
+    public var appID:String                             = null;
+    public var token:String                             = null;
+    public var requestRepeatTry:Int                     = 3;
+    public var permissionFriends(get, never):Bool;
 
+    public function get_permissionFriends():Bool {
+        return Utils.flagsOR(permissions, UserPermission.FRIENDS);
+    }
 
-
-    //////////////////
-    //   СВОЙСТВА   //
-    //////////////////
-
-    public var version(default, null):String = "0.0.2";
-    public var title(default, null):String = "ВКонтакте";
-    public var type(default, null):SocialNetworkType = SocialNetworkType.VK;
-    public var isInit(default, null):Bool = false;
-    public var appID:String = null;
-    public var secretKey:String = null;
-    public var serviceKey:String = null;
-
-
-
-    ////////////////
-    //   МЕТОДЫ   //
-    ////////////////
-
-    public function init(options:InitParams, callback:SocialError->Void):Void {
+    public function init(onComplete:Error->Void = null):Void {
         if (isInit) {
-            if (callback != null)
-                callback(new SocialError("Интерфейс уже был инициализирован"));
-
+            if (onComplete != null)
+                onComplete(new Error("The VK API interface is already initialized"));
             return;
         }
-
+        
         isInit = true;
 
-        if (callback != null)
-            callback(null);
+        if (tagSdk == null) {
+            this.onComplete = onComplete;
+
+            // Подключение SDK:
+            tagSdk = Browser.document.createScriptElement();
+            tagSdk.addEventListener("load", onSDKLoadComplete);
+            tagSdk.addEventListener("error", onSDKLoadError);
+            tagSdk.src = SDK_URL;
+            Browser.document.head.appendChild(tagSdk);
+        }
+        else {
+            if (onComplete != null)
+                onComplete(null);
+        }
+    }
+    private function onSDKLoadError(e:Event):Void {
+        tagSdk.removeEventListener("load", onSDKLoadComplete);
+        tagSdk.removeEventListener("error", onSDKLoadError);
+
+        if (tagSdk.parentNode == Browser.document.head)
+            Browser.document.head.removeChild(tagSdk);
+
+        tagSdk = null;
+
+        if (onComplete != null) {
+            var f = onComplete;
+            onComplete = null;
+            f(new Error("Failed to load VK JavaScript SDK"));
+        }
+    }
+    private function onSDKLoadComplete(e:Event):Void {
+        tagSdk.removeEventListener("load", onSDKLoadComplete);
+        tagSdk.removeEventListener("error", onSDKLoadError);
+
+        try {
+            SDK.init(onSDKInitComplete, onSDKInitError, API_VERSION);
+        }
+        catch(err:Dynamic) {
+            if (onComplete != null) {
+                var f = onComplete;
+                onComplete = null;
+                f(err);
+            }
+        }
+    }
+    private function onSDKInitComplete():Void {
+        if (onComplete != null) {
+            var f = onComplete;
+            onComplete = null;
+            f(null);
+        }
+    }
+    private function onSDKInitError():Void {
+        if (onComplete != null) {
+            var f = onComplete;
+            onComplete = null;
+            f(new Error("Failed to init VK JavaScript SDK"));
+        }
+    }
+
+    public function getUsers(   users:Array<SocialUser>,
+                                fields:SocialUserFields = null,
+                                onComplete:IGetUsersTask->Void = null,
+                                onProgress:IGetUsersTask->DynamicAccess<SocialUser>->Void = null,
+                                priority:Int = 0
+    ):IGetUsersTask {
+        var task:IGetUsersTask  = new GetUsersTask(this);
+        task.users              = users;
+        task.fields             = fields == null ? task.fields : fields;
+        task.onComplete         = onComplete;
+        task.onProgress         = onProgress;
+        task.priority           = priority;
+        task.requestRepeatTry   = requestRepeatTry;
+        task.start();
+        return task;
+    }
+
+    public function getFriends( user:SID,
+                                onComplete:IGetFriendsTask->Void = null,
+                                priority:Int = 0
+    ):IGetFriendsTask {
+        var task:IGetFriendsTask = new GetFriendsTask(this);
+        task.user               = user;
+        task.onComplete         = onComplete;
+        task.priority           = priority;
+        task.requestRepeatTry   = requestRepeatTry;
+        task.start();
+        return task;
+    }
+
+    @:keep
+    public function toString():String {
+        return "[VKontakte]";
     }
 
 
 
-    ////////////////
-    //   СЕРВЕР   //
-    ////////////////
+    ////////////////////////////////
+    //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
+    ////////////////////////////////
 
     /**
-     * Проверка авторизации пользователя.
-     * - Метод возвращает `true`, если переданный пользователь и его ключ
-     *   успешно проходят проверку на авторизацию.
-     * - Метод генерирует исключение `SocialError`, если вызывается не в
-     *   серверном режиме `NodeJS`.
+     * Парсер данных VK.
      * 
-     * Требования:
-     *   1. Указанный `appID`.
-     *   2. Указанный `secret`.
-     *   3. Приложение запущено в серверном режиме `NodeJS`.
-     * 
-     * @param sid ID Пользователя в соц. сети.
-     * @param key Ключ, которым представился пользователь.
-     * @return Возвращает `true`, если пользователь тот, кем представился.
-     * @see Документация: https://vk.com/dev/apps_init?f=3.%20auth_key
+     * Не может быть `null`
      */
-    public function checkAuthKey(sid:SID, key:String):Bool {
-        // auth_key = md5(api_id + '_' + viewer_id + '_' + api_secret)
-        #if nodejs
-        return Crypto.createHash(CryptoAlgorithm.MD5).update(appID + "_" + sid + "_" + secretKey).digest("hex") == key;
-        #else
-        throw new SocialError("Метод доступен только в серверном режиме использования");
-        #end
+    public var parser(default, null):Parser = new Parser();
+
+    /**
+     * Маска прав доступа к данным пользователя.
+     * 
+     * По умолчанию: `0` (Нет прав)
+     */
+    public var permissions:UserPermissions = 0;
+
+    /**
+     * Ссылка на JavaScript SDK VKontakte.
+     * 
+     * Становится доступной после завершения инициализации.
+     * Поле продублировано просто для удобства.
+     * 
+     * Этот геттер аналогичен вызову:
+     * ```
+     * trace(social.vk.SDK);
+     * ```
+     * 
+     * По умолчанию: `null`
+     */
+    public var sdk(get, never):Class<SDK>;
+    inline function get_sdk():Class<SDK> {
+        return SDK;
     }
 }

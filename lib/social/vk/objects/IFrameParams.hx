@@ -1,4 +1,9 @@
-package social.vk;
+package social.vk.objects;
+
+import social.vk.enums.Language;
+import social.vk.enums.Referrer;
+import social.vk.enums.ViewerType;
+import social.vk.enums.UserPermissions;
 
 /**
  * Параметры IFrame.
@@ -50,7 +55,7 @@ typedef IFrameParams =
     /**
      * Ключ доступа для вызова методов API по классической схеме.
      */
-    @:optional var access_token:UserAccessToken;
+    @:optional var access_token:String;
 
     /**
      * Идентификатор пользователя, со страницы которого было запущено приложение.
@@ -72,7 +77,7 @@ typedef IFrameParams =
     /**
      * Ключ, необходимый для авторизации пользователя на стороннем сервере.
      */
-    @:optional var auth_key:AuthKey;
+    @:optional var auth_key:String;
 
     /**
      * Идентификатор языка пользователя, просматривающего приложение.

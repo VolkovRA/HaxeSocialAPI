@@ -2,9 +2,9 @@
 	"name": "social",
 	"url": "https://github.com/VolkovRA/HaxeSocialAPI/blob/master/README.md",
 	"license": "MIT",
-	"tags": ["social", "social API", "social network", "vk", "vkontakte"],
+	"tags": ["social", "vk", "vkontakte", "ok", "fb"],
 	"description": "The API of popular social networks in one interface",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"releasenote": "Active develop",
 	"contributors": ["VolkovRA"],
 	"classPath": "lib"

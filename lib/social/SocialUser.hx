@@ -8,10 +8,10 @@ package social;
 typedef SocialUser =
 {
     /**
-     * ID Пользователя в соц. сети.
+     * ID Пользователя в социальной сети. (read-only)
      */
-    @:optional var uid:SID;
-
+    var id:SID;
+    
     /**
      * Имя.
      */
@@ -21,6 +21,11 @@ typedef SocialUser =
      * Фамилия.
      */
     @:optional var lastName:String;
+
+    /**
+     * Статус онлайна.
+     */
+    @:optional var online:OnlineType;
 
     /**
      * Гендернывй признак.
@@ -33,18 +38,32 @@ typedef SocialUser =
     @:optional var home:String;
 
     /**
-     * URL Адрес аватарки пользователя.
-     * Используется аватарка максимального, доступного разрешения.
+     * URL Адрес аватарки пользователя: 50x50.
      */
-    @:optional var avatar:String;
+    @:optional var avatar50:String;
+
+    /**
+     * URL Адрес аватарки пользователя: 100x100.
+     */
+    @:optional var avatar100:String;
+
+    /**
+     * URL Адрес аватарки пользователя: 200x200.
+     */
+    @:optional var avatar200:String;
 
     /**
      * Пользователь заблокирован.
+     * 
+     * У забаненного пользователя могут быть по прежнему доступны
+     * некоторые данные.
      */
-    @:optional var deactivated:Bool;
+    @:optional var banned:Bool;
 
     /**
-     * Пользователь удалён.
+     * Пользователь удалён или никогда не существовал.
+     * 
+     * Никакие данные пользователя не будут доступны.
      */
     @:optional var deleted:Bool;
 }

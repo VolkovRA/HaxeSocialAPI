@@ -1,4 +1,4 @@
-package social.vk;
+package social.vk.enums;
 
 /**
  * Обозначение места, откуда пользователь перешёл в приложение.
