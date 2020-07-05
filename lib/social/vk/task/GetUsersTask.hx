@@ -161,7 +161,8 @@ class GetUsersTask implements IGetUsersTask
             }
 
             // Неисправимые ошибки: (Повторный запрос - бесполезен)
-            if (    errors.error_code == ErrorCode.AUTHORISATION_FAILED
+            if (    errors.error_code == ErrorCode.AUTHORISATION_FAILED ||
+                    errors.error_code == ErrorCode.WRONG_VALUE
             ) {
                 error = lr.error;
                 info.complete = true;

@@ -89,6 +89,7 @@ class GetFriendsTask implements IGetFriendsTask
             if (    errors.error_code == ErrorCode.PRIVATE_USER ||
                     errors.error_code == ErrorCode.USER_DEACTIVATED ||
                     errors.error_code == ErrorCode.USER_REMOVED ||
+                    errors.error_code == ErrorCode.WRONG_VALUE ||
                     errors.error_code == ErrorCode.AUTHORISATION_FAILED
             ) {
                 error = new Error(errors.error_msg);
