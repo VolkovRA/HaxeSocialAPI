@@ -25,6 +25,7 @@ class GetFriendsTask implements IGetFriendsTask
     public var requestRepeatTry:Int = 0;
     public var priority:Int = 0;
     public var onComplete:IGetFriendsTask->Void = null;
+    public var userData:Dynamic = null;
 
     private var lr:ILoader = new LoaderJSONP();
     private var count:Int = 0;

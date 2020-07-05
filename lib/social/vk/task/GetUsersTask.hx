@@ -34,6 +34,7 @@ class GetUsersTask implements IGetUsersTask
     public var priority:Int = 0;
     public var onComplete:IGetUsersTask->Void = null;
     public var onProgress:IGetUsersTask->DynamicAccess<SocialUser>->Void = null;
+    public var userData:Dynamic = null;
 
     private var loaders:Array<ILoader>;
 
