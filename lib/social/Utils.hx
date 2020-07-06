@@ -139,4 +139,18 @@ class Utils
     public static inline function str(v:Dynamic):String {
         return Syntax.code("({0} + '')", v);
     }
+
+    /**
+     * Получить метку текущей даты. (mc)
+     * 
+     * Метод возвращает количество миллисекунд, прошедших
+     * с 1 января 1970 года 00:00:00 по UTC по текущий момент
+     * времени в качестве числа.
+     * 
+     * @return Временная метка.
+     * @see `Date.now()`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/now
+     */
+    public static inline function stamp():Float {
+        return Syntax.code('Date.now()');
+    }
 }

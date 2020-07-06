@@ -107,6 +107,7 @@ class Parser
             if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = readUserSex(data);
             if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = readUserOnline(data);
         }
+        user.dt = Utils.stamp();
     }
 
     /**
@@ -118,7 +119,6 @@ class Parser
     public function getUserFields(fields:SocialUserFields):String {
         var str = "";
 
-        //if (Utils.flagsOR(fields, SocialUserField.ID))            // Запрашивается по дефолту всегда
         //if (Utils.flagsOR(fields, SocialUserField.FIRST_NAME))    // Запрашивается по дефолту всегда
         //if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))     // Запрашивается по дефолту всегда
         //if (Utils.flagsOR(fields, SocialUserField.DELETED))       // Запрашивается по дефолту всегда

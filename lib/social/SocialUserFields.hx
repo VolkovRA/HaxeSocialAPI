@@ -17,57 +17,52 @@ typedef SocialUserFields = Int;
 @:enum abstract SocialUserField(Int) to Int
 {
     /**
-     * ID Пользователя: `SocialUser.id`
-     */
-    var ID = 1;
-
-    /**
      * Имя: `SocialUser.firstName`
      */
-    var FIRST_NAME = 2;
+    var FIRST_NAME = 1;
 
     /**
      * Фамилия: `SocialUser.lastName`
      */
-    var LAST_NAME = 4;
+    var LAST_NAME = 2;
 
     /**
      * Статус онлайна: `SocialUser.online`
      */
-    var ONLINE = 8;
+    var ONLINE = 4;
 
     /**
      * URL Адрес страницы пользователя: `SocialUser.home`
      */
-    var HOME = 16;
+    var HOME = 8;
 
     /**
      * Гендернывй признак: `SocialUser.sex`
      */
-    var SEX = 32;
+    var SEX = 16;
 
     /**
      * URL Адрес аватарки пользователя 50x50: `SocialUser.avatar50`
      */
-    var AVATAR_50 = 64;
+    var AVATAR_50 = 32;
 
     /**
      * URL Адрес аватарки пользователя 100x100: `SocialUser.avatar100`
      */
-    var AVATAR_100 = 128;
+    var AVATAR_100 = 64;
 
     /**
      * URL Адрес аватарки пользователя 200x200: `SocialUser.avatar200`
      */
-    var AVATAR_200 = 256;
+    var AVATAR_200 = 128;
 
     /**
      * Пользователь заблокирован: `SocialUser.banned`
      */
-    var BANNED = 512;
+    var BANNED = 256;
 
     /**
      * Пользователь удалён или никогда не существовал: `SocialUser.deleted`
      */
-    var DELETED = 1024;
+    var DELETED = 512;
 }
