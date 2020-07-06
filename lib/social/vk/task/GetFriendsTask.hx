@@ -145,6 +145,15 @@ class GetFriendsTask implements IGetFriendsTask
             return;
         }
 
+        // Ошибка VK - пустой список друзей.
+        // Очень редко, но иногда VK может возвращать пустой список друзей!
+        // Для таких случаев мы переспросим VK не менее 5 раз, что бы наверняка
+        // быть уверенными, что данный пользователь - ТОЧНО не имеет друзей.
+        if (arr.length == 0 && count < Math.max(5, requestRepeatTry)) {
+            start();
+            return;
+        }
+
         // Ответ успешно получен:
         users = arr;
         if (onComplete != null)
