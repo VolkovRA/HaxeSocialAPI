@@ -3,7 +3,6 @@ package social.vk.task;
 import haxe.DynamicAccess;
 import loader.ILoader;
 import loader.Request;
-import loader.jsonp.LoaderJSONP;
 import social.SocialUserFields;
 import social.task.IGetUsersTask;
 import social.vk.enums.ErrorCode;
@@ -11,6 +10,10 @@ import social.vk.objects.BaseError;
 import js.Syntax;
 import js.lib.Error;
 
+/**
+ * Реализация запроса данных пользователей.
+ * Может быть использован на клиенте и на сервере.
+ */
 class GetUsersTask implements IGetUsersTask 
 {
     /**
@@ -22,11 +25,12 @@ class GetUsersTask implements IGetUsersTask
      * Создать задачу запроса данных пользователей.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:VKontakte) {
+    public function new(network:ISocialNetwork) {
         this.network = network;
     }
 
     public var network(default, null):ISocialNetwork;
+    public var token:String = null;
     public var users:Array<SocialUser>;
     public var fields:SocialUserFields = SocialUserField.FIRST_NAME | SocialUserField.LAST_NAME | SocialUserField.AVATAR_100 | SocialUserField.DELETED;
     public var error:Error = null;
@@ -39,7 +43,8 @@ class GetUsersTask implements IGetUsersTask
     private var loaders:Array<ILoader>;
 
     public function start():Void {
-        var vk:VKontakte = untyped network;
+        var parser:Parser = untyped network.parser;
+
         var len = users.length;
         if (len == 0) {
             var f1 = onProgress;
@@ -71,16 +76,16 @@ class GetUsersTask implements IGetUsersTask
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:
-        var fds = vk.parser.getUserFields(fields);
+        var fds = parser.getUserFields(fields);
         i = 0;
         len = maps.length;
         loaders = new Array();
         while (i < len) {
-            var req = new Request(VKontakte.API_URL + "users.get");
+            var req = new Request(network.apiURL + "users.get");
             req.data =  "user_ids=" + getUsersIDS(maps[i]) + 
                         (fds==''?'':("&fields=" + fds)) +
-                        "&v=" + VKontakte.API_VERSION +
-                        "&access_token=" + vk.token;
+                        "&v=" + network.apiVersion +
+                        "&access_token=" + token;
 
             var info:LoaderInfo = { 
                 complete:false, 
@@ -89,9 +94,13 @@ class GetUsersTask implements IGetUsersTask
                 users:maps[i],
             };
 
-            loaders[i] = new LoaderJSONP();
+            #if nodejs
+            loaders[i] = new loader.nodejs.LoaderNodeJS();
+            #else
+            loaders[i] = new loader.jsonp.LoaderJSONP();
+            #end
             loaders[i].priority = priority;
-            loaders[i].balancer = vk.balancer;
+            loaders[i].balancer = network.balancer;
             loaders[i].onComplete = onResponse;
             loaders[i].userData = info;
             loaders[i].load(req);
@@ -114,7 +123,6 @@ class GetUsersTask implements IGetUsersTask
 
     private function onResponse(lr:ILoader):Void {
         var info:LoaderInfo = lr.userData;
-        var vk:VKontakte = untyped network;
 
         // Сетевая ошибка:
         if (lr.error != null) {
@@ -155,7 +163,7 @@ class GetUsersTask implements IGetUsersTask
                 // При запросе нескольких пользователей возвращает просто пустой ответ без ошибки.
                 // По сути, это не ошибка, просто пользователя не существует!
 
-                vk.parser.readUser(null, getFirstMapItem(info.users), fields);
+                network.parser.readUser(null, getFirstMapItem(info.users), fields);
                 info.complete = true;
                 checkComplete();
                 return;
@@ -194,13 +202,13 @@ class GetUsersTask implements IGetUsersTask
                 var item = arr[len];
                 var user = info.users[item.id];
                 received[user.id] = true;
-                vk.parser.readUser(item, user, fields);
+                network.parser.readUser(item, user, fields);
             }
 
             // Тех, кого VK не вернул - удалены или не существуют:
             var id:SID = null;
             Syntax.code('for ({0} in {1}) {', id, info.users); // for start
-                if (!received[id]) vk.parser.readUser(null, info.users[id], fields);
+                if (!received[id]) network.parser.readUser(null, info.users[id], fields);
             Syntax.code('}'); // for end
         }
         catch (err:Dynamic) {

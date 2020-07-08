@@ -7,13 +7,92 @@ import social.vk.objects.IFrameParams;
 /**
  * Парсер данных VK.
  */
-class Parser 
+class Parser implements IParser
 {
     /**
      * Создать парсер VK.
      */
     public function new() {
     }
+
+
+
+    ///////////////////
+    //   ИНТЕРФЕЙС   //
+    ///////////////////
+
+    public function readUser(data:Dynamic, user:SocialUser, fields:SocialUserFields):Void {
+        if (data == null) {
+            if (Utils.flagsOR(fields, SocialUserField.FIRST_NAME))      user.firstName = null;
+            if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))       user.lastName = null;
+            if (Utils.flagsOR(fields, SocialUserField.DELETED))         user.deleted = true;
+            if (Utils.flagsOR(fields, SocialUserField.BANNED))          user.banned = null;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = null;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = null;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = null;
+            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = null;
+            if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = null;
+            if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = null;
+        }
+        else {
+            if (Utils.flagsOR(fields, SocialUserField.FIRST_NAME))      user.firstName = data.first_name;
+            if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))       user.lastName = data.last_name;
+            if (Utils.flagsOR(fields, SocialUserField.DELETED))         user.deleted = readUserDeleted(data);
+            if (Utils.flagsOR(fields, SocialUserField.BANNED))          user.banned = readUserBanned(data);
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = data.photo_50;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = data.photo_100;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = data.photo_200;
+            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = data.domain;
+            if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = readUserSex(data);
+            if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = readUserOnline(data);
+        }
+        user.dt = Utils.stamp();
+    }
+
+    public function readUserOnline(data:Dynamic):OnlineType {
+        if (data.online > 0) {
+            if (data.online_mobile > 0)
+                return OnlineType.ONLINE_MOBILE;
+            else
+                return OnlineType.ONLINE;
+        }
+
+        return OnlineType.OFFLINE;
+    }
+
+    public function readUserBanned(data:Dynamic):Bool {
+        if (data.deactivated == 'banned')
+            return true;
+
+        return false;
+    }
+
+    public function readUserDeleted(data:Dynamic):Bool {
+        if (data.deactivated == 'deleted')
+            return true;
+
+        return false;
+    }
+
+    public function readUserSex(data:Dynamic):Sex {
+        if (data.sex == 1)
+            return Sex.FEMALE;
+        if (data.sex == 2)
+            return Sex.MALE;
+
+        return Sex.UNKNOWN;
+    }
+
+    @:keep
+    public function toString():String {
+        return "[ParserVK]";
+    }
+
+
+
+    ////////////////////////////////
+    //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
+    ////////////////////////////////
 
     /**
      * Распарсить параметры запроса iframe.
@@ -77,40 +156,6 @@ class Parser
     }
 
     /**
-     * Прочитать ответ с данными пользователя: `users.get()`
-     * @param data Полученные данные пользователя. Если `null` - пользователь считается не существующим.
-     * @param user Цель записи данных.
-     * @param fields Маска считываемых данных.
-     */
-    public function readUser(data:Dynamic, user:SocialUser, fields:SocialUserFields):Void {
-        if (data == null) {
-            if (Utils.flagsOR(fields, SocialUserField.FIRST_NAME))      user.firstName = null;
-            if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))       user.lastName = null;
-            if (Utils.flagsOR(fields, SocialUserField.DELETED))         user.deleted = true;
-            if (Utils.flagsOR(fields, SocialUserField.BANNED))          user.banned = null;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = null;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = null;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = null;
-            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = null;
-            if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = null;
-            if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = null;
-        }
-        else {
-            if (Utils.flagsOR(fields, SocialUserField.FIRST_NAME))      user.firstName = data.first_name;
-            if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))       user.lastName = data.last_name;
-            if (Utils.flagsOR(fields, SocialUserField.DELETED))         user.deleted = readUserDeleted(data);
-            if (Utils.flagsOR(fields, SocialUserField.BANNED))          user.banned = readUserBanned(data);
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = data.photo_50;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = data.photo_100;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = data.photo_200;
-            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = data.domain;
-            if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = readUserSex(data);
-            if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = readUserOnline(data);
-        }
-        user.dt = Utils.stamp();
-    }
-
-    /**
      * Получить параметр `fields` для указания конкретных, запрашиваемых полей пользователя.
      * @param fields Запрашиваемые флаги.
      * @return Список запрашиваемых полей для атрибута: `fields`.
@@ -134,59 +179,5 @@ class Parser
             return str;
 
         return str.substring(0, str.length - 1);
-    }
-
-    /**
-     * Прочитать статус онлайна пользователя.
-     * @param data Данные пользователя, полученные от VK.
-     * @return Статус онлайна.
-     */
-    public function readUserOnline(data:Dynamic):OnlineType {
-        if (data.online > 0) {
-            if (data.online_mobile > 0)
-                return OnlineType.ONLINE_MOBILE;
-            else
-                return OnlineType.ONLINE;
-        }
-
-        return OnlineType.OFFLINE;
-    }
-
-    /**
-     * Прочитать статус бана пользователя.
-     * @param data Данные пользователя, полученные от VK.
-     * @return Статус блокировки пользователя.
-     */
-    public function readUserBanned(data:Dynamic):Bool {
-        if (data.deactivated == 'banned')
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Прочитать статус удалённого пользователя.
-     * @param data Данные пользователя, полученные от VK.
-     * @return Статус удаления.
-     */
-    public function readUserDeleted(data:Dynamic):Bool {
-        if (data.deactivated == 'deleted')
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Прочитать гендерный признак пользователя.
-     * @param data Данные пользователя, полученные от VK.
-     * @return Гендерный признак пользователя.
-     */
-    public function readUserSex(data:Dynamic):Sex {
-        if (data.sex == 1)
-            return Sex.FEMALE;
-        if (data.sex == 2)
-            return Sex.MALE;
-
-        return Sex.UNKNOWN;
     }
 }

@@ -28,6 +28,13 @@ interface IGetUsersTask extends ITask<IGetUsersTask>
     public var users:Array<SocialUser>;
 
     /**
+     * Ключ авторизации, с которым должен быть выполнен данный запрос.
+     * 
+     * По умолчанию: `null`
+     */
+    public var token:String;
+
+    /**
      * Зарашиваемые данные.
      * 
      * Обратите внимание, что если флаг не указан, то соответствующие

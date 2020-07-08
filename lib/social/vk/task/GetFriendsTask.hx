@@ -2,23 +2,27 @@ package social.vk.task;
 
 import loader.ILoader;
 import loader.Request;
-import loader.jsonp.LoaderJSONP;
 import social.task.IGetFriendsTask;
 import social.vk.enums.ErrorCode;
 import social.vk.objects.BaseError;
 import js.lib.Error;
 
+/**
+ * Реализация запроса списка друзей.
+ * Может быть использован на клиенте и на сервере.
+ */
 class GetFriendsTask implements IGetFriendsTask 
 {
     /**
      * Создать задачу запроса списка друзей.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:VKontakte) {
+    public function new(network:ISocialNetwork) {
         this.network = network;
     }
 
     public var network(default, null):ISocialNetwork;
+    public var token:String = null;
     public var user:SID = null;
     public var users:Array<SID> = null;
     public var error:Error = null;
@@ -26,21 +30,24 @@ class GetFriendsTask implements IGetFriendsTask
     public var priority:Int = 0;
     public var onComplete:IGetFriendsTask->Void = null;
     public var userData:Dynamic = null;
-
-    private var lr:ILoader = new LoaderJSONP();
+    
     private var count:Int = 0;
-
+    #if nodejs
+    private var lr:ILoader = new loader.nodejs.LoaderNodeJS();
+    #else
+    private var lr:ILoader = new loader.jsonp.LoaderJSONP();
+    #end
+    
     public function start():Void {
         count ++;
 
-        var vk:VKontakte = untyped network;
-        var req = new Request(VKontakte.API_URL + "friends.get");
+        var req = new Request(network.apiURL + "friends.get");
         req.data =  "user_id=" + user + 
-                    "&v=" + VKontakte.API_VERSION +
-                    "&access_token=" + vk.token;
+                    "&v=" + network.apiVersion +
+                    "&access_token=" + token;
 
         lr.priority = priority;
-        lr.balancer = vk.balancer;
+        lr.balancer = network.balancer;
         lr.onComplete = onResponse;
         lr.load(req);
     }

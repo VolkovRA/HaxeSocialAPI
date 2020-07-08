@@ -15,6 +15,13 @@ interface IGetFriendsTask extends ITask<IGetFriendsTask>
     public var user:SID;
 
     /**
+     * Ключ авторизации, с которым должен быть выполнен данный запрос.
+     * 
+     * По умолчанию: `null`
+     */
+    public var token:String;
+
+    /**
      * Список друзей.
      * 
      * Становится доступным после завершения выполнения задачи.

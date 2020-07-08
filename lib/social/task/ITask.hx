@@ -1,6 +1,5 @@
 package social.task;
 
-import social.ISocialNetwork;
 import js.lib.Error;
 
 /**
@@ -22,7 +21,7 @@ interface ITask<T:ITask<T>>
      * Может использоваться некоторыми типами задач для
      * получения дополнительных, необходимых сведений.
      * 
-     * По умолчанию: `null`
+     * Не может быть `null`
      */
     public var network(default, null):ISocialNetwork;
 

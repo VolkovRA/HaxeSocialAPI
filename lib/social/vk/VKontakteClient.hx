@@ -6,7 +6,7 @@ import js.lib.Error;
 import js.html.ScriptElement;
 import js.html.Event;
 import loader.Balancer;
-import social.ISocialNetwork;
+import social.ISocialNetworkClient;
 import social.SocialNetworkType;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
@@ -16,13 +16,16 @@ import social.vk.enums.UserPermissions;
 import social.vk.sdk.SDK;
 
 /**
- * Реализация интерфейса для VK.
+ * Реализация интерфейса VK для клиентского приложения.
+ * 
+ * @see Документация VK: https://vk.com/dev/manuals
  */
-class VKontakte implements ISocialNetwork 
+class VKontakteClient implements ISocialNetworkClient 
 {
-    static public inline var API_VERSION:String         = "5.120"; // 03.07.2020
-    static public inline var API_URL:String             = "https://api.vk.com/method/";
-    static public inline var SDK_URL:String             = "https://vk.com/js/api/xd_connection.js?2";
+    /**
+     * URL Адрес для подключения VK JavaScript SDK.
+     */
+    static public inline var SDK_URL:String = "https://vk.com/js/api/xd_connection.js?2";
 
     // Приват
     static private var tagSdk:ScriptElement;
@@ -41,7 +44,10 @@ class VKontakte implements ISocialNetwork
     ///////////////////
 
     public var title(default, null):String              = "VKontakte";
+    public var apiURL(default, null):String             = "https://api.vk.com/method/";
+    public var apiVersion(default, null):String         = "5.120"; // 03.07.2020
     public var type(default, null):SocialNetworkType    = SocialNetworkType.VK;
+    public var parser(default, null):IParser            = new Parser();
     public var balancer(default, null):Balancer         = new Balancer(3);
     public var isInit(default, null):Bool               = false;
     public var appID:String                             = null;
@@ -97,7 +103,7 @@ class VKontakte implements ISocialNetwork
         tagSdk.removeEventListener("error", onSDKLoadError);
 
         try {
-            SDK.init(onSDKInitComplete, onSDKInitError, API_VERSION);
+            SDK.init(onSDKInitComplete, onSDKInitError, apiVersion);
         }
         catch(err:Dynamic) {
             if (onComplete != null) {
@@ -130,6 +136,7 @@ class VKontakte implements ISocialNetwork
     ):IGetUsersTask {
         var task:IGetUsersTask  = new GetUsersTask(this);
         task.users              = users;
+        task.token              = token;
         task.fields             = fields == null ? task.fields : fields;
         task.onComplete         = onComplete;
         task.onProgress         = onProgress;
@@ -145,6 +152,7 @@ class VKontakte implements ISocialNetwork
     ):IGetFriendsTask {
         var task:IGetFriendsTask = new GetFriendsTask(this);
         task.user               = user;
+        task.token              = token;
         task.onComplete         = onComplete;
         task.priority           = priority;
         task.requestRepeatTry   = requestRepeatTry;
@@ -154,7 +162,7 @@ class VKontakte implements ISocialNetwork
 
     @:keep
     public function toString():String {
-        return "[VKontakte]";
+        return "[VKontakteClient]";
     }
 
 
@@ -162,13 +170,6 @@ class VKontakte implements ISocialNetwork
     ////////////////////////////////
     //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
     ////////////////////////////////
-
-    /**
-     * Парсер данных VK.
-     * 
-     * Не может быть `null`
-     */
-    public var parser(default, null):Parser = new Parser();
 
     /**
      * Маска прав доступа к данным пользователя.
