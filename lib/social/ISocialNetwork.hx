@@ -68,6 +68,13 @@ interface ISocialNetwork
     public var apiVersion(default, null):String;
 
     /**
+     * Константы социальной сети.
+     * 
+     * Не может быть `null`
+     */
+    public var consts(default, null):Constants;
+
+    /**
      * ID Приложения.
      * 
      * Это уникальный идентификатор данного приложения в социальной сети.

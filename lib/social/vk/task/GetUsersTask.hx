@@ -17,11 +17,6 @@ import js.lib.Error;
 class GetUsersTask implements IGetUsersTask 
 {
     /**
-     * Максимальное количество запрашиваемых пользователей за один запрос. (VK)
-     */
-    static public inline var MAX_USERS:Int = 1000;
-
-    /**
      * Создать задачу запроса данных пользователей.
      * @param network Реализация соц. сети VK.
      */
@@ -60,19 +55,19 @@ class GetUsersTask implements IGetUsersTask
         var maps:Array<DynamicAccess<SocialUser>> = [{}];
         var i = 0;
         var index = 0;
-        var limit = MAX_USERS;
+        var limit = network.consts.getUsersMax;
         while (i < len) {
             var user = users[i++];
             maps[index][user.id] = user;
             limit --;
 
             if (limit == 0) {
-                limit = MAX_USERS;
+                limit = network.consts.getUsersMax;
                 index ++;
                 maps[index] = {};
             }
         }
-        if (limit == MAX_USERS) // Пользователей ровно MAX_USERS, удаляем пустую мапу! (Частный случай)
+        if (limit == network.consts.getUsersMax) // Пользователей ровно максимум, удаляем пустую мапу! (Частный случай)
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:

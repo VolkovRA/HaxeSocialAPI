@@ -54,6 +54,9 @@ class VKontakteClient implements ISocialNetworkClient
     public var token:String                             = null;
     public var requestRepeatTry:Int                     = 3;
     public var permissionFriends(get, never):Bool;
+    public var consts(default, null):Constants = {
+        getUsersMax: 1000
+    };
 
     public function get_permissionFriends():Bool {
         return Utils.flagsOR(permissions, UserPermission.FRIENDS);

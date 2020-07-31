@@ -38,6 +38,9 @@ class VKontakteServer implements ISocialNetworkServer
     public var requestRepeatTry:Int                     = 3;
     public var secretKey:String                         = null;
     public var serviceKey:String                        = null;
+    public var consts(default, null):Constants = {
+        getUsersMax: 1000
+    };
 
     public function getUsers(   users:Array<SocialUser>,
                                 fields:SocialUserFields = null,
