@@ -39,10 +39,10 @@ class Parser implements IParser
             if (Utils.flagsOR(fields, SocialUserField.LAST_NAME))       user.lastName = data.last_name;
             if (Utils.flagsOR(fields, SocialUserField.DELETED))         user.deleted = readUserDeleted(data);
             if (Utils.flagsOR(fields, SocialUserField.BANNED))          user.banned = readUserBanned(data);
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = data.photo_50;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = data.photo_100;
-            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = data.photo_200;
-            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = data.domain;
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_50))       user.avatar50 = readUserPhoto(data.photo_50);
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_100))      user.avatar100 = readUserPhoto(data.photo_100);
+            if (Utils.flagsOR(fields, SocialUserField.AVATAR_200))      user.avatar200 = readUserPhoto(data.photo_200);
+            if (Utils.flagsOR(fields, SocialUserField.HOME))            user.home = readHome(data.domain);
             if (Utils.flagsOR(fields, SocialUserField.SEX))             user.sex = readUserSex(data);
             if (Utils.flagsOR(fields, SocialUserField.ONLINE))          user.online = readUserOnline(data);
         }
@@ -58,6 +58,20 @@ class Parser implements IParser
         }
 
         return OnlineType.OFFLINE;
+    }
+
+    public function readUserPhoto(data:Dynamic):String {
+        var str = Utils.str(data);
+
+        // Невалидные данные:
+        if (str.indexOf("vk.com/images/deactivated") != -1) return null;    // https://vk.com/images/deactivated_50.png
+        if (str.indexOf("vk.com/images/camera") != -1) return null;         // https://vk.com/images/camera_50.png?ava=1
+
+        return str;
+    }
+
+    public function readHome(data:Dynamic):String {
+        return "https://vk.com/" + Utils.str(data);
     }
 
     public function readUserBanned(data:Dynamic):Bool {
