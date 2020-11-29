@@ -1,0 +1,5 @@
+# Ignore all. (Use as white list)
+*
+
+# White list:
+!bin

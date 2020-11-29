@@ -1,45 +1,144 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "build debug",
-			"type": "shell",
-			"command": "haxe",
-			"args": [
-				"build.hxml",
-				"-debug"
-			],
-			"problemMatcher": [
-				"$haxe-absolute",
-				"$haxe",
-				"$haxe-error",
-				"$haxe-trace"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"presentation": {
-				"clear": true
-			}
-		},
-		{
-			"label": "build relise",
-			"type": "shell",
-			"command": "haxe",
-			"args": [
-				"build.hxml",
-			],
-			"problemMatcher": [
-				"$haxe-absolute",
-				"$haxe",
-				"$haxe-error",
-				"$haxe-trace"
-			],
-			"group": "none",
-			"presentation": {
-				"clear": true
-			}
-		},
-	]
+    "version": "2.0.0",
+    "tasks": [
+
+        // Дефолтная задача:
+        {
+            "label": "test",
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                //"compile node",
+                "compile vk",
+                //"compile ok",
+                //"compile fb",
+
+                "image build",
+                "compose up",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "detail": "Задача по умолчанию",
+        },
+
+        // Запуск докера локально:
+        {
+            "label": "compose up",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f", "docker-compose.yml",
+                "-p", "social_api",
+                "up",
+            ],
+            "presentation": {
+                "clear": true
+            },
+            "problemMatcher": [],
+        },
+
+        // Сборка образа:
+        {
+            "label": "image build",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "build",
+                ".",
+                "-t",
+                "rvolkov/social_api:latest"
+            ],
+            "presentation": {
+                "clear": true
+            },
+            "problemMatcher": [],
+        },
+
+        // Компиляция под VK:
+        {
+            "label": "compile vk",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_vk.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция под OK:
+        {
+            "label": "compile ok",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_ok.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция под FB:
+        {
+            "label": "compile fb",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_fb.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция под NodeJS:
+        {
+            "label": "compile node",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_node.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+    ]
 }

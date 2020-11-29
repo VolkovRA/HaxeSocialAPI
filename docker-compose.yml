@@ -1,0 +1,14 @@
+# Локальная конфигурация сервера для отладки во время разработки.
+# Используется для запуска сервера на произвольной машине.
+
+version: '3.8'
+services:
+
+    # Статика игры:
+    front:
+        container_name: static
+        image: rvolkov/social_api:latest
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"

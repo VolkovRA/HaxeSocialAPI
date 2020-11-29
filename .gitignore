@@ -1,2 +1,10 @@
-/bin
+/bin/www/vk/index.js
+/bin/www/vk/index.js.map
+
+/bin/www/ok/index.js
+/bin/www/ok/index.js.map
+
+/bin/www/fb/index.js
+/bin/www/fb/index.js.map
+
 debug.log

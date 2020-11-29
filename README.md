@@ -1,4 +1,4 @@
-# API Интерфейс cоциальных сетей
+# Haxe API интерфейс для cоциальных сетей
 
 ![](https://github.com/VolkovRA/HaxeSocialAPI/blob/master/logo.png?raw=true)
 
