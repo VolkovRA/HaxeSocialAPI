@@ -12,10 +12,12 @@ import social.network.INetworkClient;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
 import social.task.IInviteTask;
+import social.task.IPostTask;
 import social.target.vk.sdk.SDK;
 import social.target.vk.task.GetUsersTask;
 import social.target.vk.task.GetFriendsTask;
 import social.target.vk.task.InviteTask;
+import social.target.vk.task.PostTask;
 import social.user.User;
 import social.user.UserField;
 
@@ -64,6 +66,10 @@ class VKontakteClient implements INetworkClient
             users: false,
             message: false,
             result: false,
+        },
+
+        post: {
+            enabled: true,
         },
         
         getUsersMax: 1000,
@@ -185,14 +191,28 @@ class VKontakteClient implements INetworkClient
         return task;
     }
 
-    public function invite(  users:Array<UserID> = null,
-                                    message:String = null,
-                                    onComplete:IInviteTask->Void = null
+    public function invite( users:Array<UserID> = null,
+                            message:String = null,
+                            onComplete:IInviteTask->Void = null
     ):IInviteTask {
         var task:IInviteTask    = new InviteTask(this);
         task.users              = users;
         task.message            = message;
         task.onComplete         = onComplete;
+        task.start();
+        return task;
+    }
+
+    public function post(   message:String = null,
+                            image:String = null,
+                            url:String = null,
+                            onComplete:IPostTask->Void = null
+    ):IPostTask {
+        var task:IPostTask  = new PostTask(this);
+        task.message        = message;
+        task.image          = image;
+        task.url            = url;
+        task.onComplete     = onComplete;
         task.start();
         return task;
     }

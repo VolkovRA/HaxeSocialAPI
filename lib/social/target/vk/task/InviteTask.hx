@@ -9,8 +9,7 @@ import social.target.vk.sdk.Event;
 import social.user.User;
 
 /**
- * Реализация запроса списка друзей.
- * Может быть использован на клиенте и на сервере.
+ * Реализация приглашения друзей.
  */
 @:dce
 class InviteTask implements IInviteTask 

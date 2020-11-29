@@ -30,9 +30,9 @@ class Main
         });
     }
     static private function onInit(error:Error):Void {
-        buildUI();
+        buildUI_VK();
     }
-    static private function buildUI():Void {
+    static private function buildUI_VK():Void {
         var bt1 = Browser.document.createButtonElement();
         bt1.textContent = "Получить список друзей";
         bt1.onclick = function(){
@@ -67,12 +67,17 @@ class Main
 
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
-        bt3.onclick = function(){ social.invite(null, "Го играть!", function(task){ trace("invite closed"); }); };
-        
+        bt3.onclick = function(){ social.invite(null, "Го играть!", function(task){ trace("Invite closed"); }); };
+
+        var bt4 = Browser.document.createButtonElement();
+        bt4.textContent = "Поделиться";
+        bt4.onclick = function(){ social.post("Заходите играть!\n\rhttps://vk.com/app7359309", "photo-192978621_457239019", "https://vk.com/app7359309", function(task){ trace("Post closed"); trace(task); }); };
+
         Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(bt1); Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(bt2); Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(bt3); Browser.document.body.appendChild(Browser.document.createBRElement());
+        Browser.document.body.appendChild(bt4); Browser.document.body.appendChild(Browser.document.createBRElement());
     }
 }

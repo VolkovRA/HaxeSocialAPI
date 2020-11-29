@@ -48,7 +48,11 @@ class VKontakteServer implements INetworkServer
             message: false,
             result: false,
         },
-        
+
+        post: {
+            enabled: true,
+        },
+
         getUsersMax: 1000,
     };
 

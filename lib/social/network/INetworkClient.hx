@@ -2,6 +2,7 @@ package social.network;
 
 import js.lib.Error;
 import social.user.User;
+import social.task.IPostTask;
 import social.task.IInviteTask;
 
 /**
@@ -84,6 +85,32 @@ interface INetworkClient extends INetwork
                             message:String = null,
                             onComplete:IInviteTask->Void = null
     ):IInviteTask;
+
+    /**
+     * Создать пост.  
+     * Открывает диалоговое окно с возможностью поделиться указанной
+     * информацией с другими пользователями.
+     * - Для вызова этого метода требуется инициализация SDK.
+     * - Вы можете проверить доступность этого функционала в: `social.network.INetwork.support.post`
+     * 
+     * ### Формат записи для изображения
+     * | Социальная сеть | Пример |
+     * |:-|:-|
+     * |ВКонтакте|[`photo100172_166443618`](https://vk.com/dev/wall.post)|
+     * |Одноклассники|[`--`](--)|
+     * |Facebook|[`--`](--)|
+     * 
+     * @param message Текст сообщения.
+     * @param image Изображение. Формат данных зависит от платформы.
+     * @param url URL Адрес внешнего ресурса.
+     * @param onComplete Колбек завершения выполнения вызова.
+     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+     */
+    public function post(   message:String = null,
+                            image:String = null,
+                            url:String = null,
+                            onComplete:IPostTask->Void = null
+    ):IPostTask;
 }
 
 /**
