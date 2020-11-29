@@ -11,7 +11,10 @@
                 "isDefault": true
             },
             "dependsOn": [
-                //"compile node",
+                //"compile nodejs",
+                //"nodejs run",
+
+                
                 "compile vk",
                 //"compile ok",
                 //"compile fb",
@@ -123,7 +126,7 @@
 
         // Компиляция под NodeJS:
         {
-            "label": "compile node",
+            "label": "compile nodejs",
             "type": "shell",
             "command": "haxe",
             "args": [
@@ -136,6 +139,23 @@
                 "$haxe-trace"
             ],
             "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Запуск NodeJS:
+        {
+            "label": "nodejs run",
+            "type": "shell",
+            "command": "node",
+            "args": [
+                "bin/node/index.js",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$node-sass"
+            ],
             "presentation": {
                 "clear": true
             }
