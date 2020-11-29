@@ -2,7 +2,7 @@ package social.target.vk;
 
 import haxe.DynamicAccess;
 import loader.Balancer;
-import social.network.Constants;
+import social.network.Support;
 import social.network.INetwork;
 import social.network.INetworkServer;
 import social.task.IGetUsersTask;
@@ -41,8 +41,13 @@ class VKontakteServer implements INetworkServer
     public var secretKey:String             = null;
     public var serviceKey:String            = null;
     public var requestRepeatTry             = 2;
-    public var consts(default, null):Constants = {
-        getUsersMax: 1000
+    public var support(default, null):Support = {
+        getUsersMax: 1000,
+
+        inviteFriends: true,
+        inviteFriendsUsers: false,
+        inviteFriendsMessage: false,
+        inviteFriendsResult: false,
     };
 
     public function getUsers(   users:Array<User>,

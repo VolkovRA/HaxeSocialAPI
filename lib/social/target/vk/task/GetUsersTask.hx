@@ -60,19 +60,19 @@ class GetUsersTask implements IGetUsersTask
         var maps:Array<DynamicAccess<User>> = [{}];
         var i = 0;
         var index = 0;
-        var limit = network.consts.getUsersMax;
+        var limit = network.support.getUsersMax;
         while (i < len) {
             var user = users[i++];
             maps[index][user.id] = user;
             limit --;
 
             if (limit == 0) {
-                limit = network.consts.getUsersMax;
+                limit = network.support.getUsersMax;
                 index ++;
                 maps[index] = {};
             }
         }
-        if (limit == network.consts.getUsersMax) // Пользователей ровно максимум, удаляем пустую мапу! (Частный случай)
+        if (limit == network.support.getUsersMax) // Пользователей ровно максимум, удаляем пустую мапу! (Частный случай)
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:

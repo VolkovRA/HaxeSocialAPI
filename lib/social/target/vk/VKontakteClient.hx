@@ -6,14 +6,16 @@ import js.lib.Error;
 import js.html.Event;
 import js.html.ScriptElement;
 import loader.Balancer;
-import social.network.Constants;
+import social.network.Support;
 import social.network.INetwork;
 import social.network.INetworkClient;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
+import social.task.IInviteFriendsTask;
 import social.target.vk.sdk.SDK;
 import social.target.vk.task.GetUsersTask;
 import social.target.vk.task.GetFriendsTask;
+import social.target.vk.task.InviteFriendsTask;
 import social.user.User;
 import social.user.UserField;
 
@@ -56,8 +58,13 @@ class VKontakteClient implements INetworkClient
     public var appID:String                 = null;
     public var token:String                 = null;
     public var requestRepeatTry             = 2;
-    public var consts(default, null):Constants = {
+    public var support(default, null):Support = {
         getUsersMax: 1000,
+
+        inviteFriends: true,
+        inviteFriendsUsers: false,
+        inviteFriendsMessage: false,
+        inviteFriendsResult: false,
     };
 
     public function init(?params:NetworkInitParams):Void {
@@ -176,6 +183,18 @@ class VKontakteClient implements INetworkClient
         return task;
     }
 
+    public function inviteFriends(  users:Array<UserID> = null,
+                                    message:String = null,
+                                    onComplete:IInviteFriendsTask->Void = null
+    ):IInviteFriendsTask {
+        var task:IInviteFriendsTask = new InviteFriendsTask(this);
+        task.users              = users;
+        task.message            = message;
+        task.onComplete         = onComplete;
+        task.start();
+        return task;
+    }
+
     @:keep
     @:noCompletion
     public function toString():String {
@@ -189,18 +208,18 @@ class VKontakteClient implements INetworkClient
     ////////////////////////////////
 
     /**
-     * Ссылка на JavaScript SDK VKontakte.
-     * 
-     * Становится доступной после завершения инициализации.
-     * Поле продублировано просто для удобства.
+     * Ссылка на JavaScript SDK.  
+     * Становится доступной после завершения инициализации.  
+     * Поле продублировано просто для удобства обращения.
      * 
      * Этот геттер аналогичен вызову:
      * ```
-     * trace(social.vk.SDK);
+     * trace(social.target.vk.sdk.SDK);
      * ```
      * 
      * По умолчанию: `null`
      */
+    @:keep
     public var sdk(get, never):Class<SDK>;
     inline function get_sdk():Class<SDK> {
         return SDK;

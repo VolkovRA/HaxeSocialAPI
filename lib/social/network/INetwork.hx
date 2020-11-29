@@ -67,12 +67,13 @@ interface INetwork
     public var apiVersion(default, null):String;
 
     /**
-     * Константы дополнительных параметров.  
-     * Содержит расширенную версию настроек для каждой отдельной сети.
+     * Параметры поддержки функционала.  
+     * Содержит описание и параметры поддерживаемого функционала
+     * данной реализацией интерфейса.
      * 
      * Не может быть `null`
      */
-    public var consts(default, null):Constants;
+    public var support(default, null):Support;
 
     /**
      * ID Приложения.  

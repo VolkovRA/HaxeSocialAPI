@@ -20,6 +20,7 @@ class Permissions implements IPermissions
     @:keep
     public var mask:UserPermissions = 0;
 
+    @:keep
     public var friends(get, never):Bool;
     function get_friends():Bool {
         return NativeJS.flagsOR(mask, UserPermission.FRIENDS);
