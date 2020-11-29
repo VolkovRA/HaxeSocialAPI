@@ -11,11 +11,11 @@ import social.network.INetwork;
 import social.network.INetworkClient;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
-import social.task.IInviteFriendsTask;
+import social.task.IInviteTask;
 import social.target.vk.sdk.SDK;
 import social.target.vk.task.GetUsersTask;
 import social.target.vk.task.GetFriendsTask;
-import social.target.vk.task.InviteFriendsTask;
+import social.target.vk.task.InviteTask;
 import social.user.User;
 import social.user.UserField;
 
@@ -59,12 +59,14 @@ class VKontakteClient implements INetworkClient
     public var token:String                 = null;
     public var requestRepeatTry             = 2;
     public var support(default, null):Support = {
+        invite: {
+            enabled: true,
+            users: false,
+            message: false,
+            result: false,
+        },
+        
         getUsersMax: 1000,
-
-        inviteFriends: true,
-        inviteFriendsUsers: false,
-        inviteFriendsMessage: false,
-        inviteFriendsResult: false,
     };
 
     public function init(?params:NetworkInitParams):Void {
@@ -183,11 +185,11 @@ class VKontakteClient implements INetworkClient
         return task;
     }
 
-    public function inviteFriends(  users:Array<UserID> = null,
+    public function invite(  users:Array<UserID> = null,
                                     message:String = null,
-                                    onComplete:IInviteFriendsTask->Void = null
-    ):IInviteFriendsTask {
-        var task:IInviteFriendsTask = new InviteFriendsTask(this);
+                                    onComplete:IInviteTask->Void = null
+    ):IInviteTask {
+        var task:IInviteTask    = new InviteTask(this);
         task.users              = users;
         task.message            = message;
         task.onComplete         = onComplete;

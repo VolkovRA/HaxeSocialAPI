@@ -2,18 +2,18 @@ package social.target.vk.task;
 
 import js.lib.Error;
 import social.network.INetwork;
-import social.task.IInviteFriendsTask;
-import social.user.User;
+import social.task.IInviteTask;
 import social.target.vk.sdk.SDK;
 import social.target.vk.sdk.Method;
 import social.target.vk.sdk.Event;
+import social.user.User;
 
 /**
  * Реализация запроса списка друзей.
  * Может быть использован на клиенте и на сервере.
  */
 @:dce
-class InviteFriendsTask implements IInviteFriendsTask 
+class InviteTask implements IInviteTask 
 {
     /**
      * Создать задачу.
@@ -28,7 +28,7 @@ class InviteFriendsTask implements IInviteFriendsTask
     public var result:Array<UserID> = null;
     public var message:String = null;
     public var error:Error = null;
-    public var onComplete:IInviteFriendsTask->Void = null;
+    public var onComplete:IInviteTask->Void = null;
     public var userData:Dynamic = null;
     private var isCompleted:Bool = false;
 
@@ -40,6 +40,7 @@ class InviteFriendsTask implements IInviteFriendsTask
     public function cancel():Void {
         if (isCompleted)
             return;
+
         isCompleted = true;
         SDK.removeCallback(Event.WINDOW_FOCUS, onFocus);
     }
@@ -54,6 +55,6 @@ class InviteFriendsTask implements IInviteFriendsTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[InviteFriendsTask VK]";
+        return "[InviteTask VK]";
     }
 }

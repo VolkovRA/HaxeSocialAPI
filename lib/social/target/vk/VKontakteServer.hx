@@ -42,12 +42,14 @@ class VKontakteServer implements INetworkServer
     public var serviceKey:String            = null;
     public var requestRepeatTry             = 2;
     public var support(default, null):Support = {
+        invite: {
+            enabled: true,
+            users: false,
+            message: false,
+            result: false,
+        },
+        
         getUsersMax: 1000,
-
-        inviteFriends: true,
-        inviteFriendsUsers: false,
-        inviteFriendsMessage: false,
-        inviteFriendsResult: false,
     };
 
     public function getUsers(   users:Array<User>,

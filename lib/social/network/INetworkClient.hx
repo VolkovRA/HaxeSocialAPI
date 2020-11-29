@@ -2,7 +2,7 @@ package social.network;
 
 import js.lib.Error;
 import social.user.User;
-import social.task.IInviteFriendsTask;
+import social.task.IInviteTask;
 
 /**
  * API Интерфейс социальной сети для клиентского приложения.
@@ -71,19 +71,19 @@ interface INetworkClient extends INetwork
     public function init(?params:NetworkInitParams):Void;
 
     /**
-     * Пригласить друзей в игру.  
+     * Пригласить друзей.  
      * Открывает диалоговое окно с возможностью приглашения друзей в приложение.  
      * - Для вызова этого метода требуется инициализация SDK.
-     * - Вы можете проверить доступность этого функционала в: `social.network.INetwork.support.inviteFriends`
+     * - Вы можете проверить доступность этого функционала в: `social.network.INetwork.support.invite`
      * @param users Список приглашаемых пользователей.
      * @param message Отправляемое сообщение.
      * @param onComplete Колбек завершения выполнения вызова.
      * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
      */
-    public function inviteFriends(  users:Array<UserID> = null,
-                                    message:String = null,
-                                    onComplete:IInviteFriendsTask->Void = null
-    ):IInviteFriendsTask;
+    public function invite( users:Array<UserID> = null,
+                            message:String = null,
+                            onComplete:IInviteTask->Void = null
+    ):IInviteTask;
 }
 
 /**

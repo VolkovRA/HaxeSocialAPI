@@ -5,7 +5,7 @@ import social.user.User;
 /**
  * Задача приглашения друзей в приложение.
  */
-interface IInviteFriendsTask extends ITask<IInviteFriendsTask> 
+interface IInviteTask extends ITask<IInviteTask> 
 {
     /**
      * Список приглашаемых.  

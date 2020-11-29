@@ -67,7 +67,7 @@ class Main
 
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
-        bt3.onclick = function(){ social.inviteFriends(null, "Го играть!", function(task){ trace("invite closed"); }); };
+        bt3.onclick = function(){ social.invite(null, "Го играть!", function(task){ trace("invite closed"); }); };
         
         Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(Browser.document.createBRElement());
