@@ -1,41 +1,48 @@
 package;
 
 import js.lib.Error;
-import social.ISocialNetworkClient;
-import social.SocialUser;
+import social.network.INetwork;
+import social.network.INetworkClient;
+import social.user.User;
 
 /**
  * Пример.
  */
 class Main 
 {
-    private static var social:ISocialNetworkClient;
+    private static var social:INetworkClient;
 
     static function main() {
+
         #if VK
         trace("Test social API VK");
-        social = new social.vk.VKontakteClient();
+        social = new social.target.vk.VKontakteClient();
         #elseif OK
         trace("Test social API OK");
-        social = new social.ok.OdnoklassnikiClient();
+        social = new social.target.ok.OdnoklassnikiClient();
         #elseif FB
         trace("Test social API FB");
-        social = new social.fb.FacebookClient();
+        social = new social.target.fb.FacebookClient();
         #end
 
-        social.token = "118ddb9c6f269ec68c117f75b5f5ad14729ce19285ae967e3425facb5ca9ae2b03b942a8935320eecb9d9";
-        social.init(onInit);
+        social.token = "4664b0a8889e4a876c7fa6326aa973721fd54c80cf44aeb2debaa2d61cadef9223be12f6c69d734ee595f";
+        social.init({
+            callback: onInit,
+            //sdk: true, // <-- Требуется запуск внутри iframe на социальной сети.
+        });
     }
-
-    static function onInit(err:Error):Void {
-        trace(social.title, "is init!", err);
+    static private function onInit(error:Error):Void {
+        trace("Init completed!");
+        if (error != null) {
+            trace(error);
+            return;
+        }
 
         social.getFriends("94", function(task) {
             if (task.error != null) {
                 trace(task.error);
                 return;
             }
-
             trace("Friends:");
             trace(task.users);
         }, 10);
@@ -51,7 +58,6 @@ class Main
                 trace(task.error);
                 return;
             }
-
             trace("Users:");
             trace(task.users);
         });

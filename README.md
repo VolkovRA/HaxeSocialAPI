@@ -1,38 +1,80 @@
 # API Интерфейс cоциальных сетей
 
+![](https://github.com/VolkovRA/HaxeSocialAPI/blob/master/logo.png?raw=true)
+
+Зачем это надо
+------------------------------
+
+Упростить работу с разношёрстными API социальных сетей, приведя их к единому, общему виду, по мере возможностей.  
+
 Описание
 ------------------------------
 
-Единый интерфейс API для разных социальных сетей.
-Дополняется по мере личной необходимости.
+Это Haxe библиотека содержит общий программный интерфейс для работы с любой социальной сетью. Она абстрагирует их самые часто используемые функций и данные в одном виде. Данная библиотека включает реализацию для работы с:
+- [ВКонтакте](https://vk.com/)
+- [Одноклассники](https://ok.ru/)
+- [Facebook](https://www.facebook.com/)
+
+Эта библиотека содержит отдельные классы для работы как на клиенте в браузере, так и на сервере в NodeJS. Пакет `social.target` содержит отдельные реализаций интерфейса под каждую конкретную соц. сеть.
+Список реализаций поддерживаемых сетей может дополняться по мере необходимости.
 
 Пример использования
 ------------------------------
 ```
-package;
-
-import social.ISocialNetwork;
-import social.InitConfig;
-import social.SocialError;
-import social.vk.VKontakte;
-
 class Main 
 {
-	private static var social:ISocialNetwork;
-	
-	static function main() {
-		var opt:InitConfig = {};
-		
-		social = new VKontakte();
-		social.init(opt, onInit)
-	}
-	
-	static function onInit(err:SocialError):Void {
-		if (err != null)
-			trace(err);
-		
-		trace(social.version);
-	}
+    private static var social:INetworkClient;
+
+    static function main() {
+
+        #if VK
+        trace("Test social API VK");
+        social = new social.target.vk.VKontakteClient();
+        #elseif OK
+        trace("Test social API OK");
+        social = new social.target.ok.OdnoklassnikiClient();
+        #elseif FB
+        trace("Test social API FB");
+        social = new social.target.fb.FacebookClient();
+        #end
+
+        social.token = "******";
+        social.init({
+            callback: onInit,
+            //sdk: true, // <-- Требуется запуск внутри iframe на социальной сети.
+        });
+    }
+    static private function onInit(error:Error):Void {
+        trace("Init completed!");
+        if (error != null) {
+            trace(error);
+            return;
+        }
+
+        social.getFriends("94", function(task) {
+            if (task.error != null) {
+                trace(task.error);
+                return;
+            }
+            trace("Friends:");
+            trace(task.users);
+        }, 10);
+
+        social.getUsers([
+            { id:"98" },            // Удалённый
+            { id:"1718726" },       // Закрытый (Приватный)
+            { id:"551229537" },     // Забаненный
+            { id:"1" },             // Павел Дуров
+            { id:"5513242495" },    // Несуществующий
+        ], null, function(task) {
+            if (task.error != null) {
+                trace(task.error);
+                return;
+            }
+            trace("Users:");
+            trace(task.users);
+        });
+    }
 }
 ```
 
