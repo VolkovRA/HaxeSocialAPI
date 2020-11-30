@@ -7,4 +7,7 @@
 /bin/www/fb/index.js
 /bin/www/fb/index.js.map
 
+/bin/node/index.js
+/bin/node/index.js.map
+
 debug.log
