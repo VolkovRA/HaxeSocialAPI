@@ -11,16 +11,18 @@
                 "isDefault": true
             },
             "dependsOn": [
-                //"compile nodejs",
-                //"nodejs run",
+                // ТЕСТЫ СЕРВЕРА:
+                "compile server vk",
+                //"compile server ok",
+                //"compile server fb",
+                "nodejs run",
 
-                
-                "compile vk",
-                //"compile ok",
-                //"compile fb",
-
-                "image build",
-                "compose up",
+                // ТЕСТЫ КЛИЕНТА:
+                //"compile client vk",
+                //"compile client ok",
+                //"compile client fb",
+                //"image build",
+                //"compose up",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -30,6 +32,12 @@
             ],
             "detail": "Задача по умолчанию",
         },
+
+
+
+        ////////////////
+        //   DOCKER   //
+        ////////////////
 
         // Запуск докера локально:
         {
@@ -47,7 +55,7 @@
             "problemMatcher": [],
         },
 
-        // Сборка образа:
+        // Сборка образа для локальных тестов:
         {
             "label": "image build",
             "type": "shell",
@@ -64,13 +72,19 @@
             "problemMatcher": [],
         },
 
-        // Компиляция под VK:
+
+
+        /////////////////
+        //   COMPILE   //
+        /////////////////
+
+        // Компиляция клиента VK:
         {
-            "label": "compile vk",
+            "label": "compile client vk",
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_vk.hxml",
+                "build_client_vk.hxml",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -84,13 +98,13 @@
             }
         },
 
-        // Компиляция под OK:
+        // Компиляция клиента OK:
         {
-            "label": "compile ok",
+            "label": "compile client ok",
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_ok.hxml",
+                "build_client_ok.hxml",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -104,13 +118,13 @@
             }
         },
 
-        // Компиляция под FB:
+        // Компиляция клиента FB:
         {
-            "label": "compile fb",
+            "label": "compile client fb",
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_fb.hxml",
+                "build_client_fb.hxml",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -124,33 +138,79 @@
             }
         },
 
-        // Компиляция под NodeJS:
+        // Компиляция сервера VK:
         {
-            "label": "compile nodejs",
+            "label": "compile server vk",
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_node.hxml",
+                "build_server_vk.hxml",
             ],
+            "group": "none",
             "problemMatcher": [
                 "$haxe-absolute",
                 "$haxe",
                 "$haxe-error",
                 "$haxe-trace"
             ],
-            "group": "none",
             "presentation": {
                 "clear": true
             }
         },
 
-        // Запуск NodeJS:
+        // Компиляция сервера OK:
+        {
+            "label": "compile server ok",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_server_ok.hxml",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция сервера FB:
+        {
+            "label": "compile server fb",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_server_fb.hxml",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+
+
+
+        ////////////////
+        //   NODEJS   //
+        ////////////////
+
+        // Запуск сервера:
         {
             "label": "nodejs run",
             "type": "shell",
             "command": "node",
             "args": [
-                "bin/node/index.js",
+                "bin/server/index.js",
             ],
             "group": "none",
             "problemMatcher": [

@@ -1,0 +1,8 @@
+-lib loader
+-lib hxnodejs
+--class-path lib 
+--class-path src 
+-main Main
+-js "bin/server/index.js"
+-D OK
+#-debug

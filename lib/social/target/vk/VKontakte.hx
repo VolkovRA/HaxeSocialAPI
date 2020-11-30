@@ -37,11 +37,9 @@ class VKontakte implements INetwork
             message: false,
             result: false,
         },
-
-        post: {
-            enabled: true,
-        },
-        
+        post: { enabled: true },
+        setLevel: { enabled: true },
+        setScores: { enabled: true },
         getUsersMax: 1000,
     };
 

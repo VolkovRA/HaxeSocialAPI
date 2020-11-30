@@ -5,6 +5,8 @@ import social.user.User;
 import social.user.UserField;
 import social.task.IGetFriendsTask;
 import social.task.IGetUsersTask;
+import social.task.ISetLevelTask;
+import social.task.ISetScoresTask;
 
 /**
  * API Интерфейс социальной сети для серверного приложения. *(NodeJS)*  
@@ -83,14 +85,14 @@ interface INetworkServer extends INetwork
     ):IGetUsersTask;
 
     /**
-    * Получить список друзей пользователя.  
-    * Выполнить запрос в социальную сеть и получить список друзей конкретного пользователя.
-    * @param user ID Пользователя, список друзей которого нужно получить.
-    * @param onComplete Колбек завершения выполнения запроса.
-    * @param priority Приоритет запроса. Используется для ограничения количества
-    *                 одновременных запросов к API социальной сети.
-    * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
-    */
+     * Получить список друзей пользователя.  
+     * Выполнить запрос в социальную сеть и получить список друзей конкретного пользователя.
+     * @param user ID Пользователя, список друзей которого нужно получить.
+     * @param onComplete Колбек завершения выполнения запроса.
+     * @param priority Приоритет запроса. Используется для ограничения количества
+     *                 одновременных запросов к API социальной сети.
+     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+     */
     public function getFriends( user:UserID,
                                 onComplete:IGetFriendsTask->Void = null,
                                 priority:Int = 0
@@ -110,4 +112,38 @@ interface INetworkServer extends INetwork
      * @throws Error Метод не имплементирован для использования на клиенте. *(В браузере)*
      */
     public function userCheckAuth(id:UserID, key:String):Bool;
+
+    /**
+     * Установить уровень игрока.  
+     * Позволяет социальной сети показать достигнутый уровень игроком
+     * в игре его друзьям или в ленте активности.
+     * @param user ID Пользователя в социальной сети.
+     * @param level Достигнутый уровень.
+     * @param onComplete Колбек завершения выполнения запроса.
+     * @param priority Приоритет запроса. Используется для ограничения количества
+     *                 одновременных запросов к API социальной сети.
+     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+     */
+    public function setLevel(   user:UserID,
+                                level:Int,
+                                onComplete:ISetLevelTask->Void = null,
+                                priority:Int = 0
+    ):ISetLevelTask;
+
+    /**
+     * Установить очки игрока.  
+     * Позволяет социальной сети показать достигнутый результат игроком
+     * в игре его друзьям или в ленте активности.
+     * @param user ID Пользователя в социальной сети.
+     * @param scores Достигнутый результат по очкам.
+     * @param onComplete Колбек завершения выполнения запроса.
+     * @param priority Приоритет запроса. Используется для ограничения количества
+     *                 одновременных запросов к API социальной сети.
+     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+     */
+     public function setScores( user:UserID,
+                                scores:Int,
+                                onComplete:ISetScoresTask->Void = null,
+                                priority:Int = 0
+    ):ISetScoresTask;
 }

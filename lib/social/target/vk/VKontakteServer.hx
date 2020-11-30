@@ -4,8 +4,12 @@ import haxe.DynamicAccess;
 import social.network.INetworkServer;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
+import social.task.ISetLevelTask;
+import social.task.ISetScoresTask;
 import social.target.vk.task.GetUsersTask;
 import social.target.vk.task.GetFriendsTask;
+import social.target.vk.task.SetLevelTask;
+import social.target.vk.task.SetScoresTask;
 import social.user.User;
 import social.user.UserField;
 
@@ -39,8 +43,8 @@ class VKontakteServer extends VKontakte implements INetworkServer
                                 priority:Int = 0
     ):IGetUsersTask {
         var task:IGetUsersTask  = new GetUsersTask(this);
-        task.users              = users;
         task.token              = serviceKey;
+        task.users              = users;
         task.fields             = fields == null ? task.fields : fields;
         task.onComplete         = onComplete;
         task.onProgress         = onProgress;
@@ -54,8 +58,38 @@ class VKontakteServer extends VKontakte implements INetworkServer
                                 priority:Int = 0
     ):IGetFriendsTask {
         var task:IGetFriendsTask = new GetFriendsTask(this);
-        task.user               = user;
         task.token              = serviceKey;
+        task.user               = user;
+        task.onComplete         = onComplete;
+        task.priority           = priority;
+        task.start();
+        return task;
+    }
+
+    public function setLevel(   user:UserID,
+                                level:Int,
+                                onComplete:ISetLevelTask->Void = null,
+                                priority:Int = 0
+    ):ISetLevelTask {
+        var task:ISetLevelTask  = new SetLevelTask(this);
+        task.token              = serviceKey;
+        task.user               = user;
+        task.level              = level;
+        task.onComplete         = onComplete;
+        task.priority           = priority;
+        task.start();
+        return task;
+    }
+
+    public function setScores(  user:UserID,
+                                scores:Int,
+                                onComplete:ISetScoresTask->Void = null,
+                                priority:Int = 0
+    ):ISetScoresTask {
+        var task:ISetScoresTask = new SetScoresTask(this);
+        task.token              = serviceKey;
+        task.user               = user;
+        task.scores             = scores;
         task.onComplete         = onComplete;
         task.priority           = priority;
         task.start();
