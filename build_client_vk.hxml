@@ -1,0 +1,7 @@
+-lib loader
+--class-path lib 
+--class-path src 
+-main Main
+-js "bin/www/vk/index.js"
+-D VK
+#-debug

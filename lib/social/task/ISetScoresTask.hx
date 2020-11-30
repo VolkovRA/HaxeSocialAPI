@@ -3,29 +3,27 @@ package social.task;
 import social.user.User;
 
 /**
- * Задача получения списка друзей.
+ * Задача установки очков игрока.
  */
-interface IGetFriendsTask extends ITask<IGetFriendsTask> 
+interface ISetScoresTask extends ITask<ISetScoresTask> 
 {
     /**
-     * ID Пользователя, список друзей которого нужно получить.  
-     * По умолчанию: `null`
+     * ID Пользователя.  
+     * Не может быть `null`
      */
     public var user:UserID;
+
+    /**
+     * Набранные очки.  
+     * Не может быть `null`
+     */
+    public var scores:Int;
 
     /**
      * Ключ авторизации, с которым должен быть выполнен данный запрос.  
      * По умолчанию: `null`
      */
     public var token:String;
-
-    /**
-     * Список друзей.  
-     * Становится доступным после завершения выполнения задачи.
-     * 
-     * По умолчанию: `null`
-     */
-    public var users:Array<UserID>;
 
     /**
      * Приоритет выполнения задачи.  

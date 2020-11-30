@@ -1,40 +1,28 @@
-# API Интерфейс cоциальных сетей
+# Haxe API интерфейс для cоциальных сетей
+
+![](https://github.com/VolkovRA/HaxeSocialAPI/blob/master/logo.png?raw=true)
+
+Зачем это надо
+------------------------------
+
+Упростить работу с разношёрстными API социальных сетей, приведя их к единому, общему виду, по мере возможностей.  
 
 Описание
 ------------------------------
 
-Единый интерфейс API для разных социальных сетей.
-Дополняется по мере личной необходимости.
+Это Haxe библиотека содержит общий программный интерфейс для работы с любой социальной сетью. Она абстрагирует их самые часто используемые функций и данные в одном виде. Данная библиотека включает реализацию для работы с:
+- [ВКонтакте](https://vk.com/)
+- [Одноклассники](https://ok.ru/)
+- [Facebook](https://www.facebook.com/)
+
+Эта библиотека содержит отдельные классы для работы как на клиенте в браузере, так и на сервере в NodeJS. Пакет `social.target` содержит отдельные реализаций интерфейса под каждую конкретную соц. сеть.
+Список реализаций поддерживаемых сетей может дополняться по мере необходимости.
 
 Пример использования
 ------------------------------
-```
-package;
 
-import social.ISocialNetwork;
-import social.InitConfig;
-import social.SocialError;
-import social.vk.VKontakte;
+Смотрите файл [Main](https://github.com/VolkovRA/HaxeSocialAPI/blob/develop/src/Main.hx).
 
-class Main 
-{
-	private static var social:ISocialNetwork;
-	
-	static function main() {
-		var opt:InitConfig = {};
-		
-		social = new VKontakte();
-		social.init(opt, onInit)
-	}
-	
-	static function onInit(err:SocialError):Void {
-		if (err != null)
-			trace(err);
-		
-		trace(social.version);
-	}
-}
-```
 
 Подключение в Haxe
 ------------------------------

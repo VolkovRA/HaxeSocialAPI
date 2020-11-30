@@ -1,45 +1,224 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "build debug",
-			"type": "shell",
-			"command": "haxe",
-			"args": [
-				"build.hxml",
-				"-debug"
-			],
-			"problemMatcher": [
-				"$haxe-absolute",
-				"$haxe",
-				"$haxe-error",
-				"$haxe-trace"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"presentation": {
-				"clear": true
-			}
-		},
-		{
-			"label": "build relise",
-			"type": "shell",
-			"command": "haxe",
-			"args": [
-				"build.hxml",
-			],
-			"problemMatcher": [
-				"$haxe-absolute",
-				"$haxe",
-				"$haxe-error",
-				"$haxe-trace"
-			],
-			"group": "none",
-			"presentation": {
-				"clear": true
-			}
-		},
-	]
+    "version": "2.0.0",
+    "tasks": [
+
+        // Дефолтная задача:
+        {
+            "label": "test",
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                // ТЕСТЫ СЕРВЕРА:
+                "compile server vk",
+                //"compile server ok",
+                //"compile server fb",
+                "nodejs run",
+
+                // ТЕСТЫ КЛИЕНТА:
+                //"compile client vk",
+                //"compile client ok",
+                //"compile client fb",
+                //"image build",
+                //"compose up",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "detail": "Задача по умолчанию",
+        },
+
+
+
+        ////////////////
+        //   DOCKER   //
+        ////////////////
+
+        // Запуск докера локально:
+        {
+            "label": "compose up",
+            "type": "shell",
+            "command": "docker-compose",
+            "args": [
+                "-f", "docker-compose.yml",
+                "-p", "social_api",
+                "up",
+            ],
+            "presentation": {
+                "clear": true
+            },
+            "problemMatcher": [],
+        },
+
+        // Сборка образа для локальных тестов:
+        {
+            "label": "image build",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "build",
+                ".",
+                "-t",
+                "rvolkov/social_api:latest"
+            ],
+            "presentation": {
+                "clear": true
+            },
+            "problemMatcher": [],
+        },
+
+
+
+        /////////////////
+        //   COMPILE   //
+        /////////////////
+
+        // Компиляция клиента VK:
+        {
+            "label": "compile client vk",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_client_vk.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция клиента OK:
+        {
+            "label": "compile client ok",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_client_ok.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция клиента FB:
+        {
+            "label": "compile client fb",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_client_fb.hxml",
+            ],
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "group": "none",
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция сервера VK:
+        {
+            "label": "compile server vk",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_server_vk.hxml",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция сервера OK:
+        {
+            "label": "compile server ok",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_server_ok.hxml",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+
+        // Компиляция сервера FB:
+        {
+            "label": "compile server fb",
+            "type": "shell",
+            "command": "haxe",
+            "args": [
+                "build_server_fb.hxml",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$haxe-absolute",
+                "$haxe",
+                "$haxe-error",
+                "$haxe-trace"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+
+
+
+        ////////////////
+        //   NODEJS   //
+        ////////////////
+
+        // Запуск сервера:
+        {
+            "label": "nodejs run",
+            "type": "shell",
+            "command": "node",
+            "args": [
+                "bin/server/index.js",
+            ],
+            "group": "none",
+            "problemMatcher": [
+                "$node-sass"
+            ],
+            "presentation": {
+                "clear": true
+            }
+        },
+    ]
 }
