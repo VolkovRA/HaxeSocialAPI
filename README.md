@@ -20,63 +20,9 @@
 
 Пример использования
 ------------------------------
-```
-class Main 
-{
-    private static var social:INetworkClient;
 
-    static function main() {
+Смотрите файл [Main](https://github.com/VolkovRA/HaxeSocialAPI/blob/develop/src/Main.hx).
 
-        #if VK
-        trace("Test social API VK");
-        social = new social.target.vk.VKontakteClient();
-        #elseif OK
-        trace("Test social API OK");
-        social = new social.target.ok.OdnoklassnikiClient();
-        #elseif FB
-        trace("Test social API FB");
-        social = new social.target.fb.FacebookClient();
-        #end
-
-        social.token = "******";
-        social.init({
-            callback: onInit,
-            //sdk: true, // <-- Требуется запуск внутри iframe на социальной сети.
-        });
-    }
-    static private function onInit(error:Error):Void {
-        trace("Init completed!");
-        if (error != null) {
-            trace(error);
-            return;
-        }
-
-        social.getFriends("94", function(task) {
-            if (task.error != null) {
-                trace(task.error);
-                return;
-            }
-            trace("Friends:");
-            trace(task.users);
-        }, 10);
-
-        social.getUsers([
-            { id:"98" },            // Удалённый
-            { id:"1718726" },       // Закрытый (Приватный)
-            { id:"551229537" },     // Забаненный
-            { id:"1" },             // Павел Дуров
-            { id:"5513242495" },    // Несуществующий
-        ], null, function(task) {
-            if (task.error != null) {
-                trace(task.error);
-                return;
-            }
-            trace("Users:");
-            trace(task.users);
-        });
-    }
-}
-```
 
 Подключение в Haxe
 ------------------------------

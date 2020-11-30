@@ -12,7 +12,7 @@ class Main
     static private inline var CLIENT_TOKEN = "****";
     static private inline var TEST_USER = "626124000";
     static private inline var SERVICE_KEY = "****";
-// 
+
     private static var client:INetworkClient;
     private static var server:INetworkServer;
 
