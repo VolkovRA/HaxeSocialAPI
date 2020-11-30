@@ -1,9 +1,6 @@
 package social.target.vk;
 
 import haxe.DynamicAccess;
-import loader.Balancer;
-import social.network.Support;
-import social.network.INetwork;
 import social.network.INetworkServer;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
@@ -17,12 +14,13 @@ import social.user.UserField;
  * @see Документация VK: https://vk.com/dev/manuals
  */
 @:dce
-class VKontakteServer implements INetworkServer
+class VKontakteServer extends VKontakte implements INetworkServer
 {
     /**
      * Создать интерфейс VK.
      */
     public function new() {
+        super();
     }
 
 
@@ -31,30 +29,8 @@ class VKontakteServer implements INetworkServer
     //   ИНТЕРФЕЙС   //
     ///////////////////
 
-    public var title(default, null)         = "VKontakte";
-    public var apiURL(default, null)        = "https://api.vk.com/method/";
-    public var apiVersion(default, null)    = "5.120"; // 03.07.2020
-    public var type(default, null)          = NetworkType.VK;
-    public var parser(default, null)        = new Parser();
-    public var balancer(default, null)      = new Balancer(3);
-    public var appID:String                 = null;
     public var secretKey:String             = null;
     public var serviceKey:String            = null;
-    public var requestRepeatTry             = 2;
-    public var support(default, null):Support = {
-        invite: {
-            enabled: true,
-            users: false,
-            message: false,
-            result: false,
-        },
-
-        post: {
-            enabled: true,
-        },
-
-        getUsersMax: 1000,
-    };
 
     public function getUsers(   users:Array<User>,
                                 fields:UserFields = null,
@@ -97,7 +73,7 @@ class VKontakteServer implements INetworkServer
 
     @:keep
     @:noCompletion
-    public function toString():String {
+    override public function toString():String {
         return "[VKontakteServer]";
     }
 }

@@ -5,9 +5,6 @@ import js.Browser;
 import js.lib.Error;
 import js.html.Event;
 import js.html.ScriptElement;
-import loader.Balancer;
-import social.network.Support;
-import social.network.INetwork;
 import social.network.INetworkClient;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
@@ -26,7 +23,7 @@ import social.user.UserField;
  * @see Документация VK: https://vk.com/dev/manuals
  */
 @:dce
-class VKontakteClient implements INetworkClient 
+class VKontakteClient extends VKontakte implements INetworkClient 
 {
     /**
      * URL Адрес для подключения VK JavaScript SDK.
@@ -41,6 +38,7 @@ class VKontakteClient implements INetworkClient
      * Создать интерфейс VK.
      */
     public function new() {
+        super();
     }
 
 
@@ -49,31 +47,9 @@ class VKontakteClient implements INetworkClient
     //   ИНТЕРФЕЙС   //
     ///////////////////
 
-    public var title(default, null)         = "VKontakte";
-    public var apiURL(default, null)        = "https://api.vk.com/method/";
-    public var apiVersion(default, null)    = "5.120"; // 03.07.2020
-    public var type(default, null)          = NetworkType.VK;
-    public var parser(default, null)        = new Parser();
-    public var balancer(default, null)      = new Balancer(3);
     public var permissions(default, null)   = new Permissions();
     public var isInit(default, null)        = false;
-    public var appID:String                 = null;
     public var token:String                 = null;
-    public var requestRepeatTry             = 2;
-    public var support(default, null):Support = {
-        invite: {
-            enabled: true,
-            users: false,
-            message: false,
-            result: false,
-        },
-
-        post: {
-            enabled: true,
-        },
-        
-        getUsersMax: 1000,
-    };
 
     public function init(?params:NetworkInitParams):Void {
         if (params == null)
@@ -219,7 +195,7 @@ class VKontakteClient implements INetworkClient
 
     @:keep
     @:noCompletion
-    public function toString():String {
+    override public function toString():String {
         return "[VKontakteClient]";
     }
 

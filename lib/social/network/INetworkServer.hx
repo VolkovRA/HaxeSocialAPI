@@ -1,11 +1,10 @@
 package social.network;
 
 import haxe.DynamicAccess;
-import js.lib.Error;
-import loader.Balancer;
 import social.user.User;
-import social.task.IGetUsersTask;
+import social.user.UserField;
 import social.task.IGetFriendsTask;
+import social.task.IGetUsersTask;
 
 /**
  * API Интерфейс социальной сети для серверного приложения. *(NodeJS)*  
@@ -63,6 +62,39 @@ interface INetworkServer extends INetwork
     ////////////////
     //   МЕТОДЫ   //
     ////////////////
+
+    /**
+     * Запросить данные пользователей.  
+     * Выполнить запрос в социальную сеть и получить данные пользователей.
+     * @param users Список запрашиваемых пользователей.
+     * @param fields Запрашиваемые поля. Если `null`, используются поля по умолчанию.
+     *               См.: `social.task.IGetUsersTask.fields`
+     * @param onComplete Колбек завершения запроса.
+     * @param onProgress Колбек прогресса загрузки.
+     * @param priority Приоритет запроса. Используется для ограничения количества
+     *                 одновременных запросов к API социальной сети.
+     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+     */
+    public function getUsers(   users:Array<User>,
+                                fields:UserFields = null,
+                                onComplete:IGetUsersTask->Void = null,
+                                onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
+                                priority:Int = 0
+    ):IGetUsersTask;
+
+    /**
+    * Получить список друзей пользователя.  
+    * Выполнить запрос в социальную сеть и получить список друзей конкретного пользователя.
+    * @param user ID Пользователя, список друзей которого нужно получить.
+    * @param onComplete Колбек завершения выполнения запроса.
+    * @param priority Приоритет запроса. Используется для ограничения количества
+    *                 одновременных запросов к API социальной сети.
+    * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
+    */
+    public function getFriends( user:UserID,
+                                onComplete:IGetFriendsTask->Void = null,
+                                priority:Int = 0
+    ):IGetFriendsTask;
 
     /**
      * Проверка авторизации пользователя.  

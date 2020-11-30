@@ -1,11 +1,6 @@
 package social.network;
 
-import haxe.DynamicAccess;
 import loader.Balancer;
-import social.user.User;
-import social.user.UserField;
-import social.task.IGetFriendsTask;
-import social.task.IGetUsersTask;
 
 /**
  * Социальная сеть.  
@@ -67,15 +62,6 @@ interface INetwork
     public var apiVersion(default, null):String;
 
     /**
-     * Параметры поддержки функционала.  
-     * Содержит описание и параметры поддерживаемого функционала
-     * данной реализацией интерфейса.
-     * 
-     * Не может быть `null`
-     */
-    public var support(default, null):Support;
-
-    /**
      * ID Приложения.  
      * Содержит уникальный идентификатор вашего приложения в социальной сети.  
      * Вы должны указать его самостоятельно.
@@ -97,44 +83,20 @@ interface INetwork
      */
     public var requestRepeatTry:Int;
 
+    /**
+     * Параметры поддержки функционала.  
+     * Содержит описание и параметры поддерживаемого функционала
+     * данной реализацией интерфейса.
+     * 
+     * Не может быть `null`
+     */
+    public var support(default, null):Support;
+
 
 
     ////////////////
     //   МЕТОДЫ   //
     ////////////////
-
-    /**
-     * Запросить данные пользователей.  
-     * Выполнить запрос в социальную сеть и получить данные пользователей.
-     * @param users Список запрашиваемых пользователей.
-     * @param fields Запрашиваемые поля. Если `null`, используются поля по умолчанию.
-     *               См.: `social.task.IGetUsersTask.fields`
-     * @param onComplete Колбек завершения запроса.
-     * @param onProgress Колбек прогресса загрузки.
-     * @param priority Приоритет запроса. Используется для ограничения количества
-     *                 одновременных запросов к API социальной сети.
-     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
-     */
-    public function getUsers(   users:Array<User>,
-                                fields:UserFields = null,
-                                onComplete:IGetUsersTask->Void = null,
-                                onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
-                                priority:Int = 0
-    ):IGetUsersTask;
-
-    /**
-     * Получить список друзей пользователя.  
-     * Выполнить запрос в социальную сеть и получить список друзей конкретного пользователя.
-     * @param user ID Пользователя, список друзей которого нужно получить.
-     * @param onComplete Колбек завершения выполнения запроса.
-     * @param priority Приоритет запроса. Используется для ограничения количества
-     *                 одновременных запросов к API социальной сети.
-     * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
-     */
-    public function getFriends( user:UserID,
-                                onComplete:IGetFriendsTask->Void = null,
-                                priority:Int = 0
-    ):IGetFriendsTask;
 
     /**
      * Получить текстовое представление объекта.
