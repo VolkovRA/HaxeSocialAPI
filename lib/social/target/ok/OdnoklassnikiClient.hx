@@ -1,4 +1,4 @@
-package social.target.vk;
+package social.target.ok;
 
 import haxe.DynamicAccess;
 import js.Browser;
@@ -10,32 +10,27 @@ import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
 import social.task.IInviteTask;
 import social.task.IPostTask;
-import social.target.vk.sdk.SDK;
-import social.target.vk.task.GetUsersTask;
-import social.target.vk.task.GetFriendsTask;
-import social.target.vk.task.InviteTask;
-import social.target.vk.task.PostTask;
 import social.user.User;
 import social.user.UserField;
 
 /**
- * Реализация интерфейса VK для клиентского приложения.  
- * @see Документация: https://vk.com/dev/manuals
+ * Реализация интерфейса OK для клиентского приложения.  
+ * @see Документация: https://apiok.ru/
  */
 @:dce
-class VKontakteClient extends VKontakte implements INetworkClient 
+class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient 
 {
     /**
      * URL Адрес для подключения VK JavaScript SDK.
      */
-    static public inline var SDK_URL:String = "https://vk.com/js/api/xd_connection.js?2";
+    static public inline var SDK_URL:String = "https://api.ok.ru/js/fapi5.js";
 
     // Приват
-    private var sdkTag:ScriptElement;
-    private var initParams:NetworkInitParams;
+    //private var sdkTag:ScriptElement;
+    //private var initParams:NetworkInitParams;
 
     /**
-     * Создать интерфейс VK.
+     * Создать интерфейс OK.
      */
     public function new() {
         super();
@@ -52,6 +47,9 @@ class VKontakteClient extends VKontakte implements INetworkClient
     public var token:String                 = null;
 
     public function init(?params:NetworkInitParams):Void {
+        trace("!!!");
+
+        /*
         if (params == null)
             params = {};
 
@@ -85,56 +83,7 @@ class VKontakteClient extends VKontakte implements INetworkClient
         initParams = null;
         if (params.callback != null)
             params.callback(null);
-    }
-    private function onSDKLoadError(e:Event):Void {
-        sdkTag.removeEventListener("load", onSDKLoadComplete);
-        sdkTag.removeEventListener("error", onSDKLoadError);
-
-        if (sdkTag.parentNode == Browser.document.head)
-            Browser.document.head.removeChild(sdkTag);
-
-        var f = initParams.callback;
-        sdkTag = null;
-        initParams = null;
-
-        if (f != null)
-            f(new Error("Ошибка загрузки JavaScript SDK для ВКонтакте"));
-    }
-    private function onSDKLoadComplete(e:Event):Void {
-        sdkTag.removeEventListener("load", onSDKLoadComplete);
-        sdkTag.removeEventListener("error", onSDKLoadError);
-
-        try {
-            SDK.init(onSDKInitComplete, onSDKInitError, apiVersion);
-        }
-        catch (err:Dynamic) {
-            if (sdkTag.parentNode == Browser.document.head)
-                Browser.document.head.removeChild(sdkTag);
-
-            var f = initParams.callback;
-            sdkTag = null;
-            initParams = null;
-
-            if (f != null)
-                f(err);
-        }
-    }
-    private function onSDKInitComplete():Void {
-        var f = initParams.callback;
-        initParams = null;
-        if (f != null)
-            f(null);
-    }
-    private function onSDKInitError():Void {
-        if (sdkTag.parentNode == Browser.document.head)
-            Browser.document.head.removeChild(sdkTag);
-
-        var f = initParams.callback;
-        sdkTag = null;
-        initParams = null;
-
-        if (f != null)
-            f(new Error("Ошибка инициализации ВКонтакте JavaScript SDK"));
+        */
     }
 
     public function getUsers(   users:Array<User>,
@@ -143,6 +92,8 @@ class VKontakteClient extends VKontakte implements INetworkClient
                                 onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
                                 priority:Int = 0
     ):IGetUsersTask {
+
+        /*
         var task:IGetUsersTask  = new GetUsersTask(this);
         task.users              = users;
         task.token              = token;
@@ -152,12 +103,16 @@ class VKontakteClient extends VKontakte implements INetworkClient
         task.priority           = priority;
         task.start();
         return task;
+        */
+
+        return null;
     }
 
     public function getFriends( user:UserID,
                                 onComplete:IGetFriendsTask->Void = null,
                                 priority:Int = 0
     ):IGetFriendsTask {
+        /*
         var task:IGetFriendsTask = new GetFriendsTask(this);
         task.user               = user;
         task.token              = token;
@@ -165,18 +120,23 @@ class VKontakteClient extends VKontakte implements INetworkClient
         task.priority           = priority;
         task.start();
         return task;
+        */
+        return null;
     }
 
     public function invite( users:Array<UserID> = null,
                             message:String = null,
                             onComplete:IInviteTask->Void = null
     ):IInviteTask {
+        /*
         var task:IInviteTask    = new InviteTask(this);
         task.users              = users;
         task.message            = message;
         task.onComplete         = onComplete;
         task.start();
         return task;
+        */
+        return null;
     }
 
     public function post(   message:String = null,
@@ -184,6 +144,7 @@ class VKontakteClient extends VKontakte implements INetworkClient
                             url:String = null,
                             onComplete:IPostTask->Void = null
     ):IPostTask {
+        /*
         var task:IPostTask  = new PostTask(this);
         task.message        = message;
         task.image          = image;
@@ -191,12 +152,14 @@ class VKontakteClient extends VKontakte implements INetworkClient
         task.onComplete     = onComplete;
         task.start();
         return task;
+        */
+        return null;
     }
 
     @:keep
     @:noCompletion
     override public function toString():String {
-        return "[VKontakteClient]";
+        return "[OdnoklassnikiClient]";
     }
 
 
@@ -217,9 +180,11 @@ class VKontakteClient extends VKontakte implements INetworkClient
      * 
      * По умолчанию: `null`
      */
+    /*
     @:keep
     public var sdk(get, never):Class<SDK>;
     inline function get_sdk():Class<SDK> {
         return SDK;
     }
+    */
 }

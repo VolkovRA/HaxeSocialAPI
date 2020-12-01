@@ -9,7 +9,7 @@ import social.user.UserField;
 import social.utils.NativeJS;
 
 /**
- * Парсер данных VK.
+ * Парсер данных для ВКонтакте.
  */
 @:dce
 class Parser implements IParser

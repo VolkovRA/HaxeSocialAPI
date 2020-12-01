@@ -57,7 +57,7 @@ interface INetwork
 
     /**
      * Версия используемого API социальной сети.  
-     * Не может быть `null`
+     * Может быть `null`
      */
     public var apiVersion(default, null):String;
 

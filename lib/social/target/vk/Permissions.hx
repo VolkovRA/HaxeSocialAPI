@@ -5,7 +5,7 @@ import social.target.vk.enums.UserPermissions;
 import social.utils.NativeJS;
 
 /**
- * Реализация списка прав доступа в VK.
+ * Реализация списка прав доступа в ВКонтакте.
  */
 @:dce
 class Permissions implements IPermissions

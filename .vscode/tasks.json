@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
 
-        // Дефолтная задача:
+        // Дефолтная задача для быстрых, локальных тестов:
         {
             "label": "test",
             "dependsOrder": "sequence",
@@ -12,17 +12,17 @@
             },
             "dependsOn": [
                 // ТЕСТЫ СЕРВЕРА:
-                "compile server vk",
+                //"compile server vk",
                 //"compile server ok",
                 //"compile server fb",
-                "nodejs run",
+                //"nodejs run",
 
                 // ТЕСТЫ КЛИЕНТА:
                 //"compile client vk",
-                //"compile client ok",
+                "compile client ok",
                 //"compile client fb",
-                //"image build",
-                //"compose up",
+                "image build",
+                "compose up",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
