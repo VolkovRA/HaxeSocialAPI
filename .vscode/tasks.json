@@ -84,7 +84,9 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_client_vk.hxml",
+                "build.hxml",
+                "-js", "bin/www/vk/index.js",
+                "-D", "VK",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -104,7 +106,9 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_client_ok.hxml",
+                "build.hxml",
+                "-js", "bin/www/ok/index.js",
+                "-D", "OK",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -124,7 +128,9 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_client_fb.hxml",
+                "build.hxml",
+                "-js", "bin/www/fb/index.js",
+                "-D", "FB",
             ],
             "problemMatcher": [
                 "$haxe-absolute",
@@ -144,7 +150,10 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_server_vk.hxml",
+                "build.hxml",
+                "-lib", "hxnodejs",
+                "-js", "bin/server/index.js",
+                "-D", "VK",
             ],
             "group": "none",
             "problemMatcher": [
@@ -164,7 +173,10 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_server_ok.hxml",
+                "build.hxml",
+                "-lib", "hxnodejs",
+                "-js", "bin/server/index.js",
+                "-D", "OK",
             ],
             "group": "none",
             "problemMatcher": [
@@ -184,7 +196,10 @@
             "type": "shell",
             "command": "haxe",
             "args": [
-                "build_server_fb.hxml",
+                "build.hxml",
+                "-lib", "hxnodejs",
+                "-js", "bin/server/index.js",
+                "-D", "FB",
             ],
             "group": "none",
             "problemMatcher": [

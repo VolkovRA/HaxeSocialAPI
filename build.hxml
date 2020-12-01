@@ -1,0 +1,10 @@
+-lib loader
+--class-path lib 
+--class-path src 
+-main Main
+
+# Раскомментировать только для подсветки в IDE:
+#-lib hxnodejs
+#-js "bin/www/vk/index.js"
+#-D VK
+#-debug
