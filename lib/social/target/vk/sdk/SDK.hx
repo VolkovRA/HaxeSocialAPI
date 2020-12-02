@@ -5,27 +5,11 @@ import haxe.extern.Rest;
 
 /**
  * Официальная JavaScript SDK ВКонтакте.  
- * В рантайме представлена глобальным объектом `VK`, тут переименована
- * для исключения конфликтов и приведения всех SDK соц. сетей к одному имени. 
+ * Используется для вызова диалоговых окон социальной сети.
  * 
- * Это описание глобального объекта VK, являющегося частью JavaScript SDK
- * ВКонтакте. Используется для вызова клиентских методов, окон, форм
- * социальной сети и выполнения запросов.
+ * Для использования ваше приложение в iframe должно находиться
+ * на сайте социальной сети.
  * 
- * Перед использованием должна быть загружена на страницу и инициализирована:
- * ```
- * <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
- * <script type="text/javascript">
- * VK.init(function() {
- *  // API initialization succeeded
- *  // Your code here
- * }, function() {
- *  // API initialization failed
- *  // Can reload page here
- * }, '5.120');
- * </script>
- * ```
- * Не будет работать, если родительский iframe не относится к https://vk.com/
  * @see Документация: https://vk.com/dev/Javascript_SDK 
  */
 @:native("VK")

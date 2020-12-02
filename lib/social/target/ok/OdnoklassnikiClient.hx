@@ -9,6 +9,7 @@ import social.network.INetworkClient;
 import social.task.IGetUsersTask;
 import social.task.IGetFriendsTask;
 import social.task.IInviteTask;
+import social.target.ok.sdk.SDK;
 import social.task.IPostTask;
 import social.user.User;
 import social.user.UserField;
@@ -26,8 +27,8 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     static public inline var SDK_URL:String = "https://api.ok.ru/js/fapi5.js";
 
     // Приват
-    //private var sdkTag:ScriptElement;
-    //private var initParams:NetworkInitParams;
+    private var sdkTag:ScriptElement;
+    private var initParams:NetworkInitParams;
 
     /**
      * Создать интерфейс OK.
@@ -175,16 +176,14 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
      * 
      * Этот геттер аналогичен вызову:
      * ```
-     * trace(social.target.vk.sdk.SDK);
+     * trace(social.target.ok.sdk.SDK);
      * ```
      * 
      * По умолчанию: `null`
      */
-    /*
     @:keep
     public var sdk(get, never):Class<SDK>;
     inline function get_sdk():Class<SDK> {
         return SDK;
     }
-    */
 }
