@@ -1,10 +1,34 @@
+# Компиляция исходного кода
+# Общие параметры:
 -lib loader
 --class-path lib 
 --class-path src 
 -main Main
 
-# Раскомментировать только для подсветки в IDE:
-#-lib hxnodejs
-#-js "bin/www/vk/index.js"
-#-D VK
-#-debug
+--each
+
+# КЛИЕНТ
+# ВКонтакте:
+-js "bin/www/vk/index.js"
+-D VK
+
+--next
+
+# Одноклассники:
+-js "bin/www/ok/index.js"
+-D OK
+
+--next
+
+# СЕРВЕР
+# ВКонтакте:
+-lib hxnodejs
+-js "bin/server/index_vk.js"
+-D VK
+
+--next
+
+# Одноклассники:
+-lib hxnodejs
+-js "bin/server/index_ok.js"
+-D OK

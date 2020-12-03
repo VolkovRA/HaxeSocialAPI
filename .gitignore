@@ -7,7 +7,11 @@
 /bin/www/fb/index.js
 /bin/www/fb/index.js.map
 
-/bin/server/index.js
-/bin/server/index.js.map
+/bin/server/index_vk.js
+/bin/server/index_vk.js.map
+/bin/server/index_ok.js
+/bin/server/index_ok.js.map
+/bin/server/index_fb.js
+/bin/server/index_fb.js.map
 
 debug.log
