@@ -48,19 +48,16 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     public var token:String                 = null;
 
     public function init(?params:NetworkInitParams):Void {
-        trace("!!!");
-
-        /*
         if (params == null)
             params = {};
 
         // Интерфейс уже инициализирован:
         if (isInit) {
             if (params.callback != null)
-                params.callback(new Error("API Интерфейс для ВКонтакте уже был инициализирован"));
+                params.callback(new Error("API Интерфейс для Одноклассников уже был инициализирован"));
             return;
         }
-        
+
         isInit = true;
         initParams = params;
 
@@ -84,7 +81,44 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
         initParams = null;
         if (params.callback != null)
             params.callback(null);
-        */
+    }
+    private function onSDKLoadError(e:Event):Void {
+        sdkTag.removeEventListener("load", onSDKLoadComplete);
+        sdkTag.removeEventListener("error", onSDKLoadError);
+
+        if (sdkTag.parentNode == Browser.document.head)
+            Browser.document.head.removeChild(sdkTag);
+
+        var f = initParams.callback;
+        sdkTag = null;
+        initParams = null;
+
+        if (f != null)
+            f(new Error("Ошибка загрузки JavaScript SDK для Одноклассники"));
+    }
+    private function onSDKLoadComplete(e:Event):Void {
+        sdkTag.removeEventListener("load", onSDKLoadComplete);
+        sdkTag.removeEventListener("error", onSDKLoadError);
+
+        var params = SDK.Util.getRequestParameters();
+        SDK.init(params.api_server, params.apiconnection, onSDKInitComplete, onSDKInitError);
+    }
+    private function onSDKInitComplete():Void {
+        var f = initParams.callback;
+        initParams = null;
+        if (f != null)
+            f(null);
+    }
+    private function onSDKInitError(error:Error):Void {
+        if (sdkTag.parentNode == Browser.document.head)
+            Browser.document.head.removeChild(sdkTag);
+
+        var f = initParams.callback;
+        sdkTag = null;
+        initParams = null;
+
+        if (f != null)
+            f(new Error("Ошибка инициализации Одноклассники JavaScript SDK\n\r" + Std.string(error)));
     }
 
     public function getUsers(   users:Array<User>,

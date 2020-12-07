@@ -80,6 +80,9 @@ class Main
         });
     }
     static private function onBrowserInit(error:Error):Void {
+        if (error != null)
+            throw error;
+
         #if VK
         buildUI_VK();
         #elseif OK
@@ -150,24 +153,6 @@ class Main
             }, 10);
         };
 
-        Browser.document.body.appendChild(Browser.document.createBRElement());
-        Browser.document.body.appendChild(Browser.document.createBRElement());
-        Browser.document.body.appendChild(bt1); Browser.document.body.appendChild(Browser.document.createBRElement());
-
-        /*
-        var bt1 = Browser.document.createButtonElement();
-        bt1.textContent = "Получить список друзей";
-        bt1.onclick = function(){
-            client.getFriends("94", function(task) {
-                if (task.error != null) {
-                    trace(task.error);
-                    return;
-                }
-                trace("Friends:");
-                trace(task.users);
-            }, 10);
-        };
-
         var bt2 = Browser.document.createButtonElement();
         bt2.textContent = "Получить данные юзеров";
         bt2.onclick = function(){
@@ -201,6 +186,5 @@ class Main
         Browser.document.body.appendChild(bt2); Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(bt3); Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(bt4); Browser.document.body.appendChild(Browser.document.createBRElement());
-        */
     }
 }
