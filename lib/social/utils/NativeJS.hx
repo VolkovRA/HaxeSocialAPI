@@ -14,6 +14,17 @@ import js.Syntax;
 class NativeJS 
 {
     /**
+     * Проверить строгое равенство.  
+     * Выполняет строгое равенство `===` и возвращает его результат.
+     * @param v1 Значение 1.
+     * @param v2 Значение 2.
+     * @return Результат строгово сравнения.
+     */
+    static public inline function eq(v1:Dynamic, v2:Dynamic):Bool {
+        return Syntax.code("({0} === {1})", v1, v2);
+    }
+
+    /**
      * Декодировать унифицированный идентификатор ресурса (URI), созданный при
      * помощи метода `encodeURI()` или другой подобной процедуры.  
      * @param uri Полный закодированный унифицированный идентификатор ресурса.
@@ -134,6 +145,16 @@ class NativeJS
      */
     public static inline function isArray(obj:Dynamic):Bool {
         return Syntax.code('({0} instanceof Array)', obj);
+    }
+
+    /**
+     * Проверка на `undefined`. *(Нативный JS)*  
+     * Производит сравнение: `value === undefined`
+     * @param value Проверяемое значение.
+     * @return Результат проверки.
+     */
+    inline static public function isUndefined(value:Dynamic):Bool {
+        return Syntax.code('({0} === undefined)', value);
     }
 
     /**
