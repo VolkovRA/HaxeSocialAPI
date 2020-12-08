@@ -219,7 +219,7 @@ class PopupManager
             items.resize(index);
             dirty = false;
         }
-        
+
         // Объектов больше нет:
         if (items.length == 0) {
             if (intervalID > 0) {

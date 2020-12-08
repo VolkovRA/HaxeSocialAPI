@@ -6,7 +6,6 @@ import js.lib.Error;
 import js.html.Event;
 import js.html.ScriptElement;
 import social.network.INetworkClient;
-import social.task.ITask;
 import social.task.client.IGetUsersTask;
 import social.task.client.IGetFriendsTask;
 import social.task.client.IInviteTask;
