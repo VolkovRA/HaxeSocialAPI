@@ -2,74 +2,30 @@ package;
 
 import js.Browser;
 import js.lib.Error;
-import social.network.INetwork;
-import social.network.INetworkClient;
-import social.network.INetworkServer;
-import social.user.User;
 
-class Main 
+class Client 
 {
     // VK
-    static private inline var TEST_USER_VK = "626124000";
-    static private inline var CLIENT_TOKEN_VK = "****";
-    static private inline var SERVICE_KEY_VK = "****";
+    static private inline var VK_USER   = "626124000";
+    static private inline var VK_TOKEN  = "****";
     // OK
-    static private inline var TEST_USER_OK = "577631278162";
-    static private inline var CLIENT_TOKEN_OK = "****";
-    static private inline var SERVICE_KEY_OK = "****";
+    static private inline var OK_USER   = "577631278162";
+    static private inline var OK_TOKEN  = "****";
     // FB
-    static private inline var TEST_USER_FB = "****";
-    static private inline var CLIENT_TOKEN_FB  = "****";
-    static private inline var SERVICE_KEY_FB = "****";
+    static private inline var FB_USER   = "****";
+    static private inline var FB_TOKEN  = "****";
 
-    private static var client:INetworkClient;
-    private static var server:INetworkServer;
-
-    /**
-     * Точка входа.
-     */
+    private static var client:social.network.INetworkClient;
     static function main() {
-        #if nodejs
-        testServer();
-        #else
-        testClient();
-        #end
-    }
-
-    /**
-     * Тесты для NodeJS.
-     */
-    static private function testServer():Void {
-        #if VK
-        server = new social.target.vk.VKontakteServer();
-        server.serviceKey = SERVICE_KEY_VK;
-        #elseif OK
-        server = new social.target.ok.OdnoklassnikiServer();
-        server.serviceKey = SERVICE_KEY_OK;
-        #elseif FB
-        server = new social.target.fb.FacebookServer();
-        server.serviceKey = SERVICE_KEY_FB;
-        #else
-        throw new Error("Реализация интерфейса не указана");
-        #end
-
-        //server.setLevel(TEST_USER, 9, function(task){ trace(task); });
-        //server.setScores(TEST_USER, 1, function(task){ trace(task); });
-    }
-
-    /**
-     * Тесты для браузера.
-     */
-    static private function testClient():Void {
         #if VK
         client = new social.target.vk.VKontakteClient();
-        client.token = CLIENT_TOKEN_VK;
+        client.token = VK_TOKEN;
         #elseif OK
         client = new social.target.ok.OdnoklassnikiClient();
-        client.token = CLIENT_TOKEN_OK;
+        client.token = OK_TOKEN;
         #elseif FB
         client = new social.target.fb.FacebookClient();
-        client.token = CLIENT_TOKEN_FB;
+        client.token = FB_TOKEN;
         #else
         throw new Error("Реализация интерфейса не указана");
         #end
@@ -95,7 +51,7 @@ class Main
         var bt1 = Browser.document.createButtonElement();
         bt1.textContent = "Получить список друзей";
         bt1.onclick = function(){
-            client.getFriends(TEST_USER_VK, function(task) {
+            client.getFriends(VK_USER, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;
@@ -126,7 +82,11 @@ class Main
 
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
-        bt3.onclick = function(){ client.invite(null, "Го играть!", function(task){ trace("Invite closed"); }); };
+        bt3.onclick = function(){
+            client.invite(null, "Го играть!1", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite([], "Го играть!2", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite([], "Го играть!3", function(task){ trace("Invite end", task.result, task.resultUsers); });
+        };
 
         var bt4 = Browser.document.createButtonElement();
         bt4.textContent = "Поделиться";
@@ -143,7 +103,7 @@ class Main
         var bt1 = Browser.document.createButtonElement();
         bt1.textContent = "Получить список друзей";
         bt1.onclick = function(){
-            client.getFriends(TEST_USER_OK, function(task) {
+            client.getFriends(VK_USER, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;
@@ -174,7 +134,11 @@ class Main
 
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
-        bt3.onclick = function(){ client.invite(null, "Го играть!", function(task){ trace("Invite closed"); }); };
+        bt3.onclick = function(){
+            client.invite(null, "Го играть!1", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite([], "Го играть!2", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite([], "Го играть!3", function(task){ trace("Invite end", task.result, task.resultUsers); });
+        };
 
         var bt4 = Browser.document.createButtonElement();
         bt4.textContent = "Поделиться";

@@ -1,9 +1,12 @@
-package social.task;
+package social.task.client;
+
+import social.network.INetworkClient;
 
 /**
  * Задача постинга на стену.
  */
-interface IPostTask extends ITask<IPostTask> 
+@:dce
+interface IPostTask extends ITask<IPostTask, INetworkClient> 
 {
     /**
      * Текст сообщения.  

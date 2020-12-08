@@ -4,10 +4,11 @@ import haxe.DynamicAccess;
 import js.lib.Error;
 import social.user.User;
 import social.user.UserField;
-import social.task.IGetFriendsTask;
-import social.task.IGetUsersTask;
-import social.task.IInviteTask;
-import social.task.IPostTask;
+import social.task.client.IGetFriendsTask;
+import social.task.client.IGetUsersTask;
+import social.task.client.IInviteTask;
+import social.task.client.IPostTask;
+import social.popup.PopupManager;
 
 /**
  * API Интерфейс социальной сети для клиентского приложения.
@@ -49,6 +50,19 @@ interface INetworkClient extends INetwork
      * Не может быть `null`
      */
     public var permissions(default, null):IPermissions;
+
+    /**
+     * Менеджер всплывающих окон.  
+     * Используется для реализации очереди вызова диалоговых окон
+     * социальной сети. В основном предназначен для внутренней реализации,
+     * но вы также можете добавлять и свои объекты в очередь.
+     * 
+     * Социальные сети не позволяют отображать более одного диалогово окна
+     * и не имеют очереди для их вызова. Этот объект решает эти проблемы.
+     * 
+     * Не может быть `null`
+     */
+    public var popup(default, null):PopupManager;
 
     /**
      * Ключ доступа для вызова методов API.  

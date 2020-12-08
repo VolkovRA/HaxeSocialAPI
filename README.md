@@ -21,7 +21,7 @@
 Пример использования
 ------------------------------
 
-Смотрите файл [Main](https://github.com/VolkovRA/HaxeSocialAPI/blob/develop/src/Main.hx).
+Смотрите файлы: [Client.hx](https://github.com/VolkovRA/HaxeSocialAPI/blob/develop/src/Client.hx) и [Server.hx](https://github.com/VolkovRA/HaxeSocialAPI/blob/develop/src/Server.hx).
 
 
 Подключение в Haxe

@@ -2,10 +2,10 @@ package social.target.ok;
 
 import haxe.DynamicAccess;
 import social.network.INetworkServer;
-import social.task.IGetUsersTask;
-import social.task.IGetFriendsTask;
-import social.task.ISetLevelTask;
-import social.task.ISetScoresTask;
+import social.task.server.IGetUsersTask;
+import social.task.server.IGetFriendsTask;
+import social.task.server.ISetLevelTask;
+import social.task.server.ISetScoresTask;
 import social.user.User;
 import social.user.UserField;
 

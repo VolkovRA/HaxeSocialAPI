@@ -21,6 +21,6 @@ class Permissions implements IPermissions
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[OdnoklassnikiPermissions]";
+        return "[Permissions]";
     }
 }

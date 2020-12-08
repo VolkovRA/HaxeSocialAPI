@@ -1,10 +1,10 @@
-package social.target.vk.task;
+package social.target.vk.task.client;
 
 import js.lib.Error;
 import loader.ILoader;
 import loader.Request;
-import social.network.INetwork;
-import social.task.IGetFriendsTask;
+import social.network.INetworkClient;
+import social.task.client.IGetFriendsTask;
 import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
 import social.user.User;
@@ -21,12 +21,12 @@ class GetFriendsTask implements IGetFriendsTask
      * Создать задачу запроса списка друзей.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:INetwork) {
+    public function new(network:INetworkClient) {
         this.network = network;
         this.requestRepeatTry = network.requestRepeatTry;
     }
 
-    public var network(default, null):INetwork;
+    public var network(default, null):INetworkClient;
     public var token:String = null;
     public var user:UserID = null;
     public var users:Array<UserID> = null;
@@ -35,14 +35,10 @@ class GetFriendsTask implements IGetFriendsTask
     public var priority:Int = 0;
     public var onComplete:IGetFriendsTask->Void = null;
     public var userData:Dynamic = null;
-    
+
     private var repeats:Int = 0;
-    #if nodejs
-    private var lr:ILoader = new loader.nodejs.LoaderNodeJS();
-    #else
-    private var lr:ILoader = new loader.jsonp.LoaderJSONP();
-    #end
-    
+    private var lr:ILoader = #if nodejs null; #else new loader.jsonp.LoaderJSONP(); #end
+
     public function start():Void {
         var req = new Request(network.apiURL + "friends.get");
         req.data =  "user_id=" + user + 
@@ -173,6 +169,6 @@ class GetFriendsTask implements IGetFriendsTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[GetFriendsTask VK user=" + user + "]";
+        return "[GetFriendsTask]";
     }
 }

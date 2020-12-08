@@ -1,4 +1,4 @@
-package social.target.vk.task;
+package social.target.vk.task.server;
 
 import js.lib.Error;
 import loader.DataFormat;
@@ -7,8 +7,8 @@ import loader.Method;
 import loader.Request;
 import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
-import social.network.INetwork;
-import social.task.ISetLevelTask;
+import social.network.INetworkServer;
+import social.task.server.ISetLevelTask;
 import social.user.User;
 import social.utils.NativeJS;
 
@@ -22,12 +22,12 @@ class SetLevelTask implements ISetLevelTask
      * Создать задачу.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:INetwork) {
+    public function new(network:INetworkServer) {
         this.network = network;
         this.requestRepeatTry = network.requestRepeatTry;
     }
 
-    public var network(default, null):INetwork;
+    public var network(default, null):INetworkServer;
     public var user:UserID;
     public var level:Int;
     public var error:Error = null;
@@ -38,11 +38,7 @@ class SetLevelTask implements ISetLevelTask
     public var userData:Dynamic = null;
 
     private var repeats:Int = 0;
-    #if nodejs
-    private var lr:ILoader = new loader.nodejs.LoaderNodeJS();
-    #else
-    private var lr:ILoader = null;
-    #end
+    private var lr:ILoader = #if nodejs new loader.nodejs.LoaderNodeJS(); #else null; #end
 
     public function start():Void {
         var req = new Request(network.apiURL + "secure.addAppEvent");
@@ -141,6 +137,6 @@ class SetLevelTask implements ISetLevelTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[SetLevelTask VK]";
+        return "[SetLevelTask]";
     }
 }

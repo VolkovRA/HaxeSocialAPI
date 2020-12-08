@@ -1,61 +1,54 @@
-package social.target.vk.task;
+package social.target.vk.task.server;
 
 import js.lib.Error;
-import loader.DataFormat;
 import loader.ILoader;
-import loader.Method;
 import loader.Request;
+import loader.nodejs.LoaderNodeJS;
+import social.network.INetworkServer;
+import social.task.server.IGetFriendsTask;
 import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
-import social.network.INetwork;
-import social.task.ISetScoresTask;
 import social.user.User;
 import social.utils.NativeJS;
 
 /**
- * Реализация установки очков игрока.
+ * Реализация запроса списка друзей.
+ * Может быть использован на клиенте и на сервере.
  */
 @:dce
-class SetScoresTask implements ISetScoresTask
+class GetFriendsTask implements IGetFriendsTask 
 {
     /**
-     * Создать задачу.
+     * Создать задачу запроса списка друзей.
      * @param network Реализация соц. сети VK.
      */
-     public function new(network:INetwork) {
+    public function new(network:INetworkServer) {
         this.network = network;
         this.requestRepeatTry = network.requestRepeatTry;
     }
 
-    public var network(default, null):INetwork;
-    public var user:UserID;
-    public var scores:Int;
-    public var error:Error = null;
-    public var onComplete:ISetScoresTask->Void = null;
+    public var network(default, null):INetworkServer;
     public var token:String = null;
-    public var priority:Int = 0;
+    public var user:UserID = null;
+    public var users:Array<UserID> = null;
+    public var error:Error = null;
     public var requestRepeatTry:Int = 0;
+    public var priority:Int = 0;
+    public var onComplete:IGetFriendsTask->Void = null;
     public var userData:Dynamic = null;
 
     private var repeats:Int = 0;
-    #if nodejs
-    private var lr:ILoader = new loader.nodejs.LoaderNodeJS();
-    #else
-    private var lr:ILoader = null;
-    #end
+    private var lr:ILoader = new LoaderNodeJS();
 
     public function start():Void {
-        var req = new Request(network.apiURL + "secure.addAppEvent");
-        req.method = Method.POST;
+        var req = new Request(network.apiURL + "friends.get");
         req.data =  "user_id=" + user + 
-                    "&activity_id=2" +
-                    "&value=" + NativeJS.str(scores) +
                     "&v=" + network.apiVersion +
                     "&access_token=" + token;
+
         lr.priority = priority;
         lr.balancer = network.balancer;
         lr.onComplete = onResponse;
-        lr.dataFormat = DataFormat.JSON;
         lr.load(req);
     }
 
@@ -67,17 +60,18 @@ class SetScoresTask implements ISetScoresTask
     }
 
     private function onResponse(lr:ILoader):Void {
-        
-        // Разбор ответа.
+
         // Сетевая ошибка:
         if (lr.error != null) {
             if (repeats++ < requestRepeatTry) {
                 start();
                 return;
             }
+
             error = lr.error;
             if (onComplete != null)
                 onComplete(this);
+
             return;
         }
 
@@ -87,17 +81,21 @@ class SetScoresTask implements ISetScoresTask
                 start();
                 return;
             }
-            error = new Error("Получен пустой ответ от VK на запрос: secure.addAppEvent");
+
+            error = new Error("Empty response of vk get friends");
             if (onComplete != null)
                 onComplete(this);
+
             return;
         }
 
         // Ошибки VK:
         var errors:BaseError = lr.data.error;
         if (errors != null) {
+
             // Неисправимые ошибки: (Повторный запрос - бесполезен)
-            if (    errors.error_code == ErrorCode.USER_DEACTIVATED ||
+            if (    errors.error_code == ErrorCode.PRIVATE_USER ||
+                    errors.error_code == ErrorCode.USER_DEACTIVATED ||
                     errors.error_code == ErrorCode.USER_REMOVED ||
                     errors.error_code == ErrorCode.WRONG_VALUE ||
                     errors.error_code == ErrorCode.AUTHORISATION_FAILED
@@ -105,6 +103,7 @@ class SetScoresTask implements ISetScoresTask
                 error = new Error(errors.error_msg);
                 if (onComplete != null)
                     onComplete(this);
+
                 return;
             }
 
@@ -118,22 +117,52 @@ class SetScoresTask implements ISetScoresTask
             error = new Error(errors.error_msg);
             if (onComplete != null)
                 onComplete(this);
+
             return;
         }
+        
+        // Ожидаем такой массив: Array<Int>
+        var arr:Dynamic = null;
+        try {
+            arr = lr.data.response.items;
 
-        // Должен быть конкретный ответ:
-        if (lr.data.response != 1) {
+            // Необходимо привести массив в соответствие с контрактом:
+            var len = arr.length;
+            while (len-- > 0)
+                arr[len] = NativeJS.str(arr[len]);
+        }
+        catch (err:Dynamic) {
             if (repeats++ < requestRepeatTry) {
                 start();
                 return;
             }
-            error = new Error("Получен некорректный ответ от VK: secure.addAppEvent");
+
+            var msg:String = "Error read get friends vk response:\n";
+            if (err.message == null) {
+                error = new Error(msg + NativeJS.str(err));
+            }
+            else {
+                err.message = msg + NativeJS.str(err.message);
+                error = err;
+            } 
+
             if (onComplete != null)
                 onComplete(this);
+
             return;
         }
 
-        // Всё ок:
+        // Ошибка VK - пустой список друзей.
+        // Очень редко, но иногда VK может возвращать пустой список друзей!
+        // Для таких случаев мы переспросим VK не менее 5 раз, что бы наверняка
+        // быть уверенными, что данный пользователь - ТОЧНО не имеет друзей.
+        if (arr.length == 0 && repeats++ < Math.max(5, requestRepeatTry)) {
+            start();
+            return;
+        }
+
+        // Ответ успешно получен:
+        users = arr;
         if (onComplete != null)
             onComplete(this);
     }
@@ -141,6 +170,6 @@ class SetScoresTask implements ISetScoresTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[SetScoresTask VK]";
+        return "[GetFriendsTask]";
     }
 }

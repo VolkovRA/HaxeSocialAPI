@@ -105,7 +105,7 @@ class Parser implements IParser
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[ParserVK]";
+        return "[Parser]";
     }
 
 

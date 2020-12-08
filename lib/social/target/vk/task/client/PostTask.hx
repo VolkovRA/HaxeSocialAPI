@@ -1,26 +1,27 @@
-package social.target.vk.task;
+package social.target.vk.task.client;
 
 import js.lib.Error;
-import social.network.INetwork;
-import social.task.IPostTask;
+import social.network.INetworkClient;
+import social.task.client.IPostTask;
 import social.target.vk.sdk.SDK;
 import social.utils.NativeJS;
+import social.popup.IPopup;
 
 /**
  * Реализация поста на стену.
  */
 @:dce
-class PostTask implements IPostTask 
+class PostTask implements IPostTask implements IPopup
 {
     /**
      * Создать задачу.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:INetwork) {
+    public function new(network:INetworkClient) {
         this.network = network;
     }
 
-    public var network(default, null):INetwork;
+    public var network(default, null):INetworkClient;
     public var result:Bool = false;
     public var message:String = null;
     public var image:String = null;
@@ -29,9 +30,14 @@ class PostTask implements IPostTask
     public var error:Error = null;
     public var onComplete:IPostTask->Void = null;
     public var userData:Dynamic = null;
+    private var popupIndex:Int = -1;
     private var isCompleted:Bool = false;
 
     public function start():Void {
+        network.popup.add(this);
+    }
+
+    private function show():Void {
 
         // Пример фото: photo-100172_166443618
         // Дока: https://vk.com/dev/wall.post
@@ -54,6 +60,7 @@ class PostTask implements IPostTask
             return;
 
         isCompleted = true;
+        network.popup.remove(this);
     }
 
     private function onResult(result:Dynamic):Void {
@@ -61,6 +68,7 @@ class PostTask implements IPostTask
             return;
 
         isCompleted = true;
+        network.popup.remove(this);
 
         // Пытаемься прочитать ответ:
         // data.response.post_id
@@ -104,6 +112,6 @@ class PostTask implements IPostTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[PostTask VK]";
+        return "[PostTask]";
     }
 }

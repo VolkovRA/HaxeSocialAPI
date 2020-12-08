@@ -29,6 +29,6 @@ class Permissions implements IPermissions
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[VKontaktePermissions]";
+        return "[Permissions]";
     }
 }

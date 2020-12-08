@@ -6,17 +6,18 @@ import js.lib.Error;
 import js.html.Event;
 import js.html.ScriptElement;
 import social.network.INetworkClient;
-import social.task.IGetUsersTask;
-import social.task.IGetFriendsTask;
-import social.task.IInviteTask;
-import social.task.IPostTask;
+import social.task.client.IGetUsersTask;
+import social.task.client.IGetFriendsTask;
+import social.task.client.IInviteTask;
+import social.task.client.IPostTask;
 import social.target.vk.sdk.SDK;
-import social.target.vk.task.GetUsersTask;
-import social.target.vk.task.GetFriendsTask;
-import social.target.vk.task.InviteTask;
-import social.target.vk.task.PostTask;
+import social.target.vk.task.client.GetUsersTask;
+import social.target.vk.task.client.GetFriendsTask;
+import social.target.vk.task.client.InviteTask;
+import social.target.vk.task.client.PostTask;
 import social.user.User;
 import social.user.UserField;
+import social.popup.PopupManager;
 
 /**
  * Реализация интерфейса VK для клиентского приложения.  
@@ -48,6 +49,7 @@ class VKontakteClient extends VKontakte implements INetworkClient
     ///////////////////
 
     public var permissions(default, null)   = new Permissions();
+    public var popup(default, null)         = new PopupManager();
     public var isInit(default, null)        = false;
     public var token:String                 = null;
 

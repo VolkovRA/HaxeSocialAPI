@@ -6,6 +6,7 @@ import social.user.Sex;
 import social.user.User;
 import social.user.UserField;
 import social.utils.NativeJS;
+import social.task.client.IInviteTask;
 
 /**
  * Парсер данных для Одноклассников.
@@ -107,6 +108,35 @@ class Parser implements IParser
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[ParserOK]";
+        return "[Parser]";
+    }
+
+
+
+    ////////////////////////////////
+    //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
+    ////////////////////////////////
+
+    /**
+     * Прочитать результат вызова приглашения друзей.
+     * @param result Результат вызова, полученный от Одноклассников.
+     * @return Результат вызова в стандартизированном виде.
+     */
+    public function getInvitedResult(result:String):InviteResult {
+        if (result == "cancel") return InviteResult.CANCELED;
+        if (result == "ok")     return InviteResult.ACCEPTED;
+        return InviteResult.UNKNOWN;
+    }
+
+    /**
+     * Прочитать результат вызова приглашения друзей - список приглашённых пользователей.
+     * @param result Результат вызова, полученный от Одноклассников.
+     * @return Список приглашённых.
+     */
+    public function getInvitedResultUsers(result:String):Array<UserID> {
+        if (result == null || result == "" || result == "null")
+            return null;
+
+        return result.split(",");
     }
 }

@@ -1,6 +1,7 @@
-package social.task;
+package social.task.client;
 
 import haxe.DynamicAccess;
+import social.network.INetworkClient;
 import social.user.User;
 import social.user.UserField;
 
@@ -11,7 +12,8 @@ import social.user.UserField;
  * 
  * Вы можете указать маску запрашиваемых данных: `fields`
  */
-interface IGetUsersTask extends ITask<IGetUsersTask> 
+@:dce
+interface IGetUsersTask extends ITask<IGetUsersTask, INetworkClient> 
 {
     /**
      * Список запрошенных пользователей.  

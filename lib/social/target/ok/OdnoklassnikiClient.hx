@@ -6,13 +6,17 @@ import js.lib.Error;
 import js.html.Event;
 import js.html.ScriptElement;
 import social.network.INetworkClient;
-import social.task.IGetUsersTask;
-import social.task.IGetFriendsTask;
-import social.task.IInviteTask;
+import social.task.ITask;
+import social.task.client.IGetUsersTask;
+import social.task.client.IGetFriendsTask;
+import social.task.client.IInviteTask;
+import social.task.client.IPostTask;
 import social.target.ok.sdk.SDK;
-import social.task.IPostTask;
+import social.target.ok.task.client.InviteTask;
 import social.user.User;
 import social.user.UserField;
+import social.popup.PopupManager;
+import social.utils.Dispatcher;
 
 /**
  * Реализация интерфейса OK для клиентского приложения.  
@@ -44,6 +48,7 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     ///////////////////
 
     public var permissions(default, null)   = new Permissions();
+    public var popup(default, null)         = new PopupManager();
     public var isInit(default, null)        = false;
     public var token:String                 = null;
 
@@ -106,6 +111,12 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     private function onSDKInitComplete():Void {
         var f = initParams.callback;
         initParams = null;
+
+        // Глобальное событие методов UI:
+        untyped Browser.window.API_callback = function(method:String, result:String, data:Dynamic) {
+            onUIResult.emit(method, result, data);
+        }
+
         if (f != null)
             f(null);
     }
@@ -163,15 +174,12 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
                             message:String = null,
                             onComplete:IInviteTask->Void = null
     ):IInviteTask {
-        /*
         var task:IInviteTask    = new InviteTask(this);
         task.users              = users;
         task.message            = message;
         task.onComplete         = onComplete;
         task.start();
         return task;
-        */
-        return null;
     }
 
     public function post(   message:String = null,
@@ -202,6 +210,16 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     ////////////////////////////////
     //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
     ////////////////////////////////
+
+    /**
+     * Глобальный колбек обратного вызова для всех методов категорий UI.  
+     * Подпишитесь на это событие самостоятельно, если вам нужно получать
+     * обратный вызов в ответ на использование всех методов категорий UI.
+     * 
+     * Не может быть `null`
+     */
+    @:keep
+    public var onUIResult(default, null):Dispatcher<API_callback> = new Dispatcher();
 
     /**
      * Ссылка на JavaScript SDK.  

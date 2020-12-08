@@ -1,6 +1,7 @@
 package social.network;
 
 import loader.Balancer;
+import social.utils.Capabilities;
 
 /**
  * Социальная сеть.  
@@ -84,13 +85,13 @@ interface INetwork
     public var requestRepeatTry:Int;
 
     /**
-     * Параметры поддержки функционала.  
+     * Параметры поддерживаемого функционала.  
      * Содержит описание и параметры поддерживаемого функционала
      * данной реализацией интерфейса.
      * 
      * Не может быть `null`
      */
-    public var support(default, null):Support;
+    public var capabilities(default, null):Capabilities;
 
 
 

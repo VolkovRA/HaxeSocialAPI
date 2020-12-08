@@ -1,37 +1,44 @@
-package social.target.vk.task;
+package social.target.vk.task.client;
 
 import js.lib.Error;
-import social.network.INetwork;
-import social.task.IInviteTask;
+import social.network.INetworkClient;
+import social.task.client.IInviteTask;
 import social.target.vk.sdk.SDK;
 import social.target.vk.sdk.Method;
 import social.target.vk.sdk.Event;
 import social.user.User;
+import social.popup.IPopup;
 
 /**
  * Реализация приглашения друзей.
  */
 @:dce
-class InviteTask implements IInviteTask 
+class InviteTask implements IInviteTask implements IPopup
 {
     /**
      * Создать задачу.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:INetwork) {
+    public function new(network:INetworkClient) {
         this.network = network;
     }
 
-    public var network(default, null):INetwork;
+    public var network(default, null):INetworkClient;
     public var users:Array<UserID> = null;
-    public var result:Array<UserID> = null;
     public var message:String = null;
     public var error:Error = null;
     public var onComplete:IInviteTask->Void = null;
     public var userData:Dynamic = null;
+    public var result:InviteResult = InviteResult.UNKNOWN;
+    public var resultUsers:Array<UserID> = null;
+    private var popupIndex:Int = -1;
     private var isCompleted:Bool = false;
 
     public function start():Void {
+        network.popup.add(this);
+    }
+
+    private function show():Void {
         SDK.addCallback(Event.WINDOW_FOCUS, onFocus);
         SDK.callMethod(Method.SHOW_INVITE_BOX);
     }
@@ -41,11 +48,13 @@ class InviteTask implements IInviteTask
             return;
 
         isCompleted = true;
+        network.popup.remove(this);
         SDK.removeCallback(Event.WINDOW_FOCUS, onFocus);
     }
 
     private function onFocus():Void {
         isCompleted = true;
+        network.popup.remove(this);
         SDK.removeCallback(Event.WINDOW_FOCUS, onFocus);
         if (onComplete != null)
             onComplete(this);
@@ -54,6 +63,6 @@ class InviteTask implements IInviteTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[InviteTask VK]";
+        return "[InviteTask]";
     }
 }

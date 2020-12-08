@@ -1,8 +1,8 @@
 package social.target.ok;
 
 import loader.Balancer;
-import social.network.Support;
 import social.network.INetwork;
+import social.utils.Capabilities;
 
 /**
  * Базовый, абстрактный класс для реализации интерфейса Одноклассников.  
@@ -30,7 +30,7 @@ class Odnoklassniki implements INetwork
     public var balancer(default, null)      = new Balancer(3);
     public var appID:String                 = null;
     public var requestRepeatTry             = 2;
-    public var support(default, null):Support = {
+    public var capabilities(default, null):Capabilities = {
         invite: {
             enabled: true,
             users: true,

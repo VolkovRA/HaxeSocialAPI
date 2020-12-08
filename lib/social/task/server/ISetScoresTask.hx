@@ -1,11 +1,13 @@
-package social.task;
+package social.task.server;
 
+import social.network.INetworkServer;
 import social.user.User;
 
 /**
- * Задача установки уровня игрока.
+ * Задача установки очков игрока.
  */
-interface ISetLevelTask extends ITask<ISetLevelTask> 
+@:dce
+interface ISetScoresTask extends ITask<ISetScoresTask, INetworkServer> 
 {
     /**
      * ID Пользователя.  
@@ -14,10 +16,10 @@ interface ISetLevelTask extends ITask<ISetLevelTask>
     public var user:UserID;
 
     /**
-     * Достигнутый уровень.  
+     * Набранные очки.  
      * Не может быть `null`
      */
-    public var level:Int;
+    public var scores:Int;
 
     /**
      * Ключ авторизации, с которым должен быть выполнен данный запрос.  

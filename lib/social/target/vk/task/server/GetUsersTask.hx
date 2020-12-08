@@ -1,12 +1,13 @@
-package social.target.vk.task;
+package social.target.vk.task.server;
 
 import haxe.DynamicAccess;
 import js.Syntax;
 import js.lib.Error;
 import loader.ILoader;
 import loader.Request;
-import social.network.INetwork;
-import social.task.IGetUsersTask;
+import loader.nodejs.LoaderNodeJS;
+import social.network.INetworkServer;
+import social.task.server.IGetUsersTask;
 import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
 import social.user.User;
@@ -24,12 +25,12 @@ class GetUsersTask implements IGetUsersTask
      * Создать задачу запроса данных пользователей.
      * @param network Реализация соц. сети VK.
      */
-    public function new(network:INetwork) {
+    public function new(network:INetworkServer) {
         this.network = network;
         this.requestRepeatTry = network.requestRepeatTry;
     }
 
-    public var network(default, null):INetwork;
+    public var network(default, null):INetworkServer;
     public var token:String = null;
     public var users:Array<User>;
     public var fields:UserFields = UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED;
@@ -60,19 +61,19 @@ class GetUsersTask implements IGetUsersTask
         var maps:Array<DynamicAccess<User>> = [{}];
         var i = 0;
         var index = 0;
-        var limit = network.support.getUsersMax;
+        var limit = network.capabilities.getUsersMax;
         while (i < len) {
             var user = users[i++];
             maps[index][user.id] = user;
             limit --;
 
             if (limit == 0) {
-                limit = network.support.getUsersMax;
+                limit = network.capabilities.getUsersMax;
                 index ++;
                 maps[index] = {};
             }
         }
-        if (limit == network.support.getUsersMax) // Пользователей ровно максимум, удаляем пустую мапу! (Частный случай)
+        if (limit == network.capabilities.getUsersMax) // Пользователей ровно максимум, удаляем пустую мапу! (Частный случай)
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:
@@ -94,11 +95,7 @@ class GetUsersTask implements IGetUsersTask
                 users:maps[i],
             };
 
-            #if nodejs
             loaders[i] = new loader.nodejs.LoaderNodeJS();
-            #else
-            loaders[i] = new loader.jsonp.LoaderJSONP();
-            #end
             loaders[i].priority = priority;
             loaders[i].balancer = network.balancer;
             loaders[i].onComplete = onResponse;
@@ -265,7 +262,7 @@ class GetUsersTask implements IGetUsersTask
     @:keep
     @:noCompletion
     public function toString():String {
-        return "[GetUsersTask VK users=" + users.length + "]";
+        return "[GetUsersTask]";
     }
 }
 

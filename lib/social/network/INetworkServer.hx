@@ -3,10 +3,10 @@ package social.network;
 import haxe.DynamicAccess;
 import social.user.User;
 import social.user.UserField;
-import social.task.IGetFriendsTask;
-import social.task.IGetUsersTask;
-import social.task.ISetLevelTask;
-import social.task.ISetScoresTask;
+import social.task.server.IGetFriendsTask;
+import social.task.server.IGetUsersTask;
+import social.task.server.ISetLevelTask;
+import social.task.server.ISetScoresTask;
 
 /**
  * API Интерфейс социальной сети для серверного приложения. *(NodeJS)*  
