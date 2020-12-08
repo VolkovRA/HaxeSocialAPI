@@ -199,7 +199,7 @@ class PopupManager
      * Хендлер для обратного вызова `setInterval`.
      */
     private function onUpdate():Void {
-        trace("onUpdate", length);
+
         // Цикл обновления.
         // Чистим список, удаляем null'ы:
         if (dirty) {
@@ -231,7 +231,6 @@ class PopupManager
 
         // Следующий вызов:
         if (current == null && stamp + delay < NativeJS.stamp()) {
-            trace("SHOW");
             current = items[0];
             current.show();
         }
