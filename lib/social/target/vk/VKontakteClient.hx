@@ -24,6 +24,7 @@ import social.popup.PopupManager;
  * @see Документация: https://vk.com/dev/manuals
  */
 @:dce
+@:access(social.task)
 class VKontakteClient extends VKontakte implements INetworkClient 
 {
     /**
@@ -183,13 +184,13 @@ class VKontakteClient extends VKontakte implements INetworkClient
 
     public function post(   message:String = null,
                             image:String = null,
-                            url:String = null,
+                            link:String = null,
                             onComplete:IPostTask->Void = null
     ):IPostTask {
         var task:IPostTask  = new PostTask(this);
         task.message        = message;
         task.image          = image;
-        task.url            = url;
+        task.link           = link;
         task.onComplete     = onComplete;
         task.start();
         return task;

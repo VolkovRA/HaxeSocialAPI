@@ -26,13 +26,13 @@ interface IGetUsersTask extends ITask<IGetUsersTask, INetworkServer>
      * 
      * Не может быть `null`
      */
-    public var users:Array<User>;
+    public var users(default, null):Array<User>;
 
     /**
      * Ключ авторизации, с которым должен быть выполнен данный запрос.  
      * По умолчанию: `null`
      */
-    public var token:String;
+    public var token(default, null):String;
 
     /**
      * Маска запрашиваемых данных.  
@@ -50,7 +50,7 @@ interface IGetUsersTask extends ITask<IGetUsersTask, INetworkServer>
      * 
      * По умолчанию: `UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED`
      */
-    public var fields:UserFields;
+    public var fields(default, null):UserFields;
 
     /**
      * Приоритет выполнения задачи.  
@@ -60,19 +60,19 @@ interface IGetUsersTask extends ITask<IGetUsersTask, INetworkServer>
      * 
      * По умолчанию: `0`
      */
-    public var priority:Int;
+    public var priority(default, null):Int;
 
     /**
      * Количество повторных попыток запроса в случае ошибки.  
      * Инициирует повторный запрос в случае ошибки указанное
      * количество раз до получения валидного ответа или
-     * исчерпания попыток.
+     * полного исчерпания попыток.
      * 
      * *п.с. При повторных запросых колбеки не вызываются.*
      * 
-     * По умолчанию: `social.network.INetwork.requestRepeatTry`
+     * По умолчанию: `social.network.INetwork.repeats`
      */
-    public var requestRepeatTry:Int;
+    public var repeats(default, null):Int;
 
     /**
      * Колбек прогресса загрузки.  

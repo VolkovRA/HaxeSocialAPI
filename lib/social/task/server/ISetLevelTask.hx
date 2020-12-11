@@ -13,19 +13,19 @@ interface ISetLevelTask extends ITask<ISetLevelTask, INetworkServer>
      * ID Пользователя.  
      * Не может быть `null`
      */
-    public var user:UserID;
+    public var user(default, null):UserID;
 
     /**
      * Достигнутый уровень.  
      * Не может быть `null`
      */
-    public var level:Int;
+    public var level(default, null):Int;
 
     /**
      * Ключ авторизации, с которым должен быть выполнен данный запрос.  
      * По умолчанию: `null`
      */
-    public var token:String;
+    public var token(default, null):String;
 
     /**
      * Приоритет выполнения задачи.  
@@ -35,17 +35,17 @@ interface ISetLevelTask extends ITask<ISetLevelTask, INetworkServer>
      * 
      * По умолчанию: `0`
      */
-    public var priority:Int;
+    public var priority(default, null):Int;
 
     /**
      * Количество повторных попыток запроса в случае ошибки.  
      * Инициирует повторный запрос в случае ошибки указанное
      * количество раз до получения валидного ответа или
-     * исчерпания попыток.
+     * полного исчерпания попыток.
      * 
      * *п.с. При повторных запросых колбеки не вызываются.*
      * 
-     * По умолчанию: `social.network.INetwork.requestRepeatTry`
+     * По умолчанию: `social.network.INetwork.repeats`
      */
-    public var requestRepeatTry:Int;
+    public var repeats(default, null):Int;
 }

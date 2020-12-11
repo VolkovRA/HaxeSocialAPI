@@ -1,6 +1,5 @@
 package;
 
-import js.Browser;
 import js.lib.Error;
 
 class Server 

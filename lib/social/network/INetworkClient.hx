@@ -153,13 +153,13 @@ interface INetworkClient extends INetwork
      * 
      * @param message Текст сообщения.
      * @param image Изображение. Формат данных зависит от платформы.
-     * @param url URL Адрес внешнего ресурса.
+     * @param link URL Адрес внешнего ресурса.
      * @param onComplete Колбек завершения выполнения вызова.
      * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
      */
     public function post(   message:String = null,
                             image:String = null,
-                            url:String = null,
+                            link:String = null,
                             onComplete:IPostTask->Void = null
     ):IPostTask;
 }

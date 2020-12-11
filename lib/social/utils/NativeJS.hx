@@ -191,4 +191,13 @@ class NativeJS
     public static inline function stamp():Timestamp {
         return Syntax.code('Date.now()');
     }
+
+    /**
+     * Прочитать JSON.
+     * @param str Строка данных в формате JSON.
+     * @return Объект.
+     */
+    public static inline function parseJSON(str:String):Dynamic {
+        return Syntax.code('JSON.parse({0})', str);
+    }
 }

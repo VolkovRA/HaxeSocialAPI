@@ -14,6 +14,7 @@ import social.user.UserField;
  * @see Документация: https://apiok.ru/
  */
 @:dce
+@:access(social.task)
 class OdnoklassnikiServer extends Odnoklassniki implements INetworkServer
 {
     /**

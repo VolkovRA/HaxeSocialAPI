@@ -13,21 +13,21 @@ interface IGetFriendsTask extends ITask<IGetFriendsTask, INetworkServer>
      * ID Пользователя, список друзей которого нужно получить.  
      * По умолчанию: `null`
      */
-    public var user:UserID;
+    public var user(default, null):UserID;
 
     /**
      * Ключ авторизации, с которым должен быть выполнен данный запрос.  
      * По умолчанию: `null`
      */
-    public var token:String;
+    public var token(default, null):String;
 
     /**
-     * Список друзей.  
+     * Загруженный список друзей.  
      * Становится доступным после завершения выполнения задачи.
      * 
      * По умолчанию: `null`
      */
-    public var users:Array<UserID>;
+    public var result(default, null):Array<UserID>;
 
     /**
      * Приоритет выполнения задачи.  
@@ -37,17 +37,17 @@ interface IGetFriendsTask extends ITask<IGetFriendsTask, INetworkServer>
      * 
      * По умолчанию: `0`
      */
-    public var priority:Int;
+    public var priority(default, null):Int;
 
     /**
      * Количество повторных попыток запроса в случае ошибки.  
      * Инициирует повторный запрос в случае ошибки указанное
      * количество раз до получения валидного ответа или
-     * исчерпания попыток.
+     * полного исчерпания попыток.
      * 
      * *п.с. При повторных запросых колбеки не вызываются.*
      * 
-     * По умолчанию: `social.network.INetwork.requestRepeatTry`
+     * По умолчанию: `social.network.INetwork.repeats`
      */
-    public var requestRepeatTry:Int;
+    public var repeats(default, null):Int;
 }

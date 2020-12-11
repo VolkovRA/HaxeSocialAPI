@@ -23,16 +23,16 @@ class InviteTask implements IInviteTask implements IPopup
         this.network = network;
     }
 
-    public var network(default, null):INetworkClient;
-    public var users:Array<UserID> = null;
-    public var message:String = null;
-    public var error:Error = null;
-    public var onComplete:IInviteTask->Void = null;
-    public var userData:Dynamic = null;
-    public var result:InviteResult = InviteResult.UNKNOWN;
-    public var resultUsers:Array<UserID> = null;
-    private var popupIndex:Int = -1;
-    private var isCompleted:Bool = false;
+    public var network(default, null):INetworkClient    = null;
+    public var users(default, null):Array<UserID>       = null;
+    public var message(default, null):String            = null;
+    public var error(default, null):Error               = null;
+    public var result(default, null):InviteResult       = InviteResult.UNKNOWN;
+    public var resultUsers(default, null):Array<UserID> = null;
+    public var userData:Dynamic                         = null;
+    public var onComplete:IInviteTask->Void             = null;
+    private var popupIndex:Int                          = -1;
+    private var isCompleted:Bool                        = false;
 
     public function start():Void {
         network.popup.add(this);

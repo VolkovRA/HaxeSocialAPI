@@ -7,6 +7,7 @@ import social.user.User;
 import social.user.UserField;
 import social.utils.NativeJS;
 import social.task.client.IInviteTask;
+import social.task.client.IPostTask;
 
 /**
  * Парсер данных для Одноклассников.
@@ -138,5 +139,51 @@ class Parser implements IParser
             return null;
 
         return result.split(",");
+    }
+
+    /**
+     * Прочитать результат вызова поста на стену.
+     * @param result Результат вызова, полученный от Одноклассников.
+     * @return Результат вызова в стандартизированном виде.
+     */
+    public function getPostResult(result:String):PostResult {
+        if (result == "cancel") return PostResult.CANCELED;
+        if (result == "ok")     return PostResult.ACCEPTED;
+        return PostResult.UNKNOWN;
+    }
+
+    /**
+     * Прочитать результат поста на стену - ID нового поста.
+     * @param result Результат вызова, полученный от Одноклассников.
+     * @return ID Нового поста.
+     */
+    public function getPostResultPostID(result:String):String {
+        if (result == null || result == "" || result == "null" || result == "0")
+            return null;
+
+        return result;
+    }
+
+    /**
+     * Проверка ответа на ошибку.  
+     * SDK Возвращает ошибку в строке в формате JSON, если такова имела место быть.
+     * @param result Ответ от JS SDK.
+     * @return Это ошибка.
+     */
+    public function isResultDataError(result:String):Bool {
+        if (result == null || result == "" || result == "null" || result == "0" || result == "cancel")
+            return false;
+
+        var obj:Dynamic = null;
+        try {
+            obj = NativeJS.parseJSON(result);
+        }
+        catch(err:Dynamic){
+        }
+
+        if (obj == null)
+            return false;
+
+        return true;
     }
 }

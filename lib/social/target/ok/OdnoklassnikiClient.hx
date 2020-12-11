@@ -12,6 +12,7 @@ import social.task.client.IInviteTask;
 import social.task.client.IPostTask;
 import social.target.ok.sdk.SDK;
 import social.target.ok.task.client.InviteTask;
+import social.target.ok.task.client.PostTask;
 import social.user.User;
 import social.user.UserField;
 import social.popup.PopupManager;
@@ -22,6 +23,7 @@ import social.utils.Dispatcher;
  * @see Документация: https://apiok.ru/
  */
 @:dce
+@:access(social.task)
 class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient 
 {
     /**
@@ -183,19 +185,16 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
 
     public function post(   message:String = null,
                             image:String = null,
-                            url:String = null,
+                            link:String = null,
                             onComplete:IPostTask->Void = null
     ):IPostTask {
-        /*
         var task:IPostTask  = new PostTask(this);
         task.message        = message;
         task.image          = image;
-        task.url            = url;
+        task.link           = link;
         task.onComplete     = onComplete;
         task.start();
         return task;
-        */
-        return null;
     }
 
     @:keep

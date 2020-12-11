@@ -4,58 +4,70 @@ import social.network.INetworkClient;
 import social.user.User;
 
 /**
- * Задача приглашения друзей в приложение.
+ * Задача для приглашения друзей в приложение.  
+ * Вы можете получить экземпляр этого объекта путём вызова
+ * метода API: `INetworkClient.invite()` одной из реализаций
+ * социальной сети.
+ * 
+ * Этот интерфейс описывает параметры задачи для всех типов
+ * социальных сетей.
  */
 @:dce
 interface IInviteTask extends ITask<IInviteTask, INetworkClient> 
 {
     /**
-     * Список приглашаемых.  
-     * Может быть `null`
+     * Список приглашаемых пользователей.  
+     * По умолчанию: `null`
+     * 
+     * ---
+     * *Может не поддерживаться. См.: `INetwork.capabilities.invite.users`*
      */
-    public var users:Array<UserID>;
+    public var users(default, null):Array<UserID>;
 
     /**
      * Текст приглашения.  
-     * Может быть `null`
+     * По умолчанию: `null`
+     * 
+     * ---
+     * *Может не поддерживаться. См.: `INetwork.capabilities.invite.message`*
      */
-    public var message:String;
+    public var message(default, null):String;
 
     /**
      * Результат вызова.  
-     * Содержит ответ пользователя на вызов данного метода API.
+     * Содержит реакцию пользователя, пригласил или нет.
      * 
-     * **Платформозависимые данные**  
-     * Не все социальные сети возвращают это поле. Для подробностей
-     * поддержки смотрите свойство: `INetwork.capabilities.invite`
+     * По умолчанию: `InviteResult.UNKNOWN`
      * 
-     * По умолчанию: `InviteResult.UNKNOWN` *(Для всех соц. сетей)*
+     * ---
+     * *Может не поддерживаться. См.: `INetwork.capabilities.invite.result`*
      */
-    public var result:InviteResult;
+    public var result(default, null):InviteResult;
 
     /**
      * Результат вызова - список приглашённых.  
-     * Содержит список ID пользователей, которым было отправлено
-     * приглашение.
+     * Содержит ID пользователей, которым было отправлено приглашение.
      * 
-     * **Платформозависимые данные**  
-     * Не все социальные сети возвращают это поле. Для подробностей
-     * поддержки смотрите свойство: `INetwork.capabilities.invite`
+     * По умолчанию: `null`
      * 
-     * Может быть `null`
+     * ---
+     * *Может не поддерживаться. См.: `INetwork.capabilities.invite.resultUsers`*
      */
-    public var resultUsers:Array<UserID>;
+    public var resultUsers(default, null):Array<UserID>;
 }
 
 /**
- * Результат вызова метода API для приглашения пользователей.
+ * Результат вызова приглашения друзей.  
+ * Описывает реакцию пользователя в ответ на вызов.
  */
 @:enum abstract InviteResult(String) to String from String
 {
     /**
      * Неизвестно.   
-     * Пользователь не отриагировал на вызов метода или
+     * Пользователь не отреагировал на вызов метода или
      * социальная сеть не предоставила нам его ответ.
+     * 
+     * Значение по умолчанию.
      */
     var UNKNOWN = "unknown";
 

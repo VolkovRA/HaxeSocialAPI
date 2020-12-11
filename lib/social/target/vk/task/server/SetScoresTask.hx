@@ -24,20 +24,19 @@ class SetScoresTask implements ISetScoresTask
      */
      public function new(network:INetworkServer) {
         this.network = network;
-        this.requestRepeatTry = network.requestRepeatTry;
+        this.repeats = network.repeats;
     }
 
-    public var network(default, null):INetworkServer;
-    public var user:UserID;
-    public var scores:Int;
-    public var error:Error = null;
-    public var onComplete:ISetScoresTask->Void = null;
-    public var token:String = null;
-    public var priority:Int = 0;
-    public var requestRepeatTry:Int = 0;
-    public var userData:Dynamic = null;
-
-    private var repeats:Int = 0;
+    public var network(default, null):INetworkServer    = null;
+    public var user(default, null):UserID               = null;
+    public var error(default, null):Error               = null;
+    public var token(default, null):String              = null;
+    public var scores(default, null):Int                = 0;
+    public var priority(default, null):Int              = 0;
+    public var repeats(default, null):Int               = 0;
+    public var userData:Dynamic                         = null;
+    public var onComplete:ISetScoresTask->Void          = null;
+    private var r:Int                                   = 0;
     private var lr:ILoader = #if nodejs new loader.nodejs.LoaderNodeJS(); #else null; #end
     
     public function start():Void {
@@ -67,7 +66,7 @@ class SetScoresTask implements ISetScoresTask
         // Разбор ответа.
         // Сетевая ошибка:
         if (lr.error != null) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -79,7 +78,7 @@ class SetScoresTask implements ISetScoresTask
 
         // Пустой ответ:
         if (lr.data == null) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -105,7 +104,7 @@ class SetScoresTask implements ISetScoresTask
             }
 
             // Возможно, повторный запрос исправит проблему: (VK Иногда может тупить)
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -119,7 +118,7 @@ class SetScoresTask implements ISetScoresTask
 
         // Должен быть конкретный ответ:
         if (lr.data.response != 1) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }

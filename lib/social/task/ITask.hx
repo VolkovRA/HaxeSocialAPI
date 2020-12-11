@@ -35,7 +35,7 @@ interface ITask<T:ITask<T,N>, N:INetwork>
      * 
      * По умолчанию: `null`
      */
-    public var error:Error;
+    public var error(default, null):Error;
 
     /**
      * Колбек завершения.  

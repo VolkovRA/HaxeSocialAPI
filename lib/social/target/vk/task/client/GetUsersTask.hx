@@ -26,25 +26,23 @@ class GetUsersTask implements IGetUsersTask
      */
     public function new(network:INetworkClient) {
         this.network = network;
-        this.requestRepeatTry = network.requestRepeatTry;
+        this.repeats = network.repeats;
     }
 
-    public var network(default, null):INetworkClient;
-    public var token:String = null;
-    public var users:Array<User>;
-    public var fields:UserFields = UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED;
-    public var error:Error = null;
-    public var requestRepeatTry:Int = 0;
-    public var priority:Int = 0;
-    public var onComplete:IGetUsersTask->Void = null;
+    public var network(default, null):INetworkClient    = null;
+    public var token(default, null):String              = null;
+    public var users(default, null):Array<User>         = null;
+    public var fields(default, null):UserFields         = UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED;
+    public var error(default, null):Error               = null;
+    public var repeats(default, null):Int               = 0;
+    public var priority(default, null):Int              = 0;
+    public var userData:Dynamic                         = null;
+    public var onComplete:IGetUsersTask->Void           = null;
     public var onProgress:IGetUsersTask->DynamicAccess<User>->Void = null;
-    public var userData:Dynamic = null;
-
-    private var loaders:Array<ILoader>;
+    private var loaders:Array<ILoader> = null;
 
     public function start():Void {
         var parser:Parser = untyped network.parser;
-
         var len = users.length;
         if (len == 0) {
             var f1 = onProgress;
@@ -89,7 +87,7 @@ class GetUsersTask implements IGetUsersTask
 
             var info:LoaderInfo = { 
                 complete:false, 
-                repeats:0, 
+                r:0, 
                 req:req,
                 users:maps[i],
             };
@@ -122,7 +120,7 @@ class GetUsersTask implements IGetUsersTask
 
         // Сетевая ошибка:
         if (lr.error != null) {
-            if (info.repeats++ < requestRepeatTry) {
+            if (info.r++ < repeats) {
                 lr.load(info.req);
                 return;
             }
@@ -135,7 +133,7 @@ class GetUsersTask implements IGetUsersTask
 
         // Пустой ответ:
         if (lr.data == null) {
-            if (info.repeats++ < requestRepeatTry) {
+            if (info.r++ < repeats) {
                 lr.load(info.req);
                 return;
             }
@@ -167,14 +165,14 @@ class GetUsersTask implements IGetUsersTask
             if (    errors.error_code == ErrorCode.AUTHORISATION_FAILED ||
                     errors.error_code == ErrorCode.WRONG_VALUE
             ) {
-                error = lr.error;
+                error = new Error(errors.error_msg);
                 info.complete = true;
                 checkComplete();
                 return;
             }
 
             // Возможно, повторный запрос исправит проблему: (VK Иногда может тупить)
-            if (info.repeats++ < requestRepeatTry) {
+            if (info.r++ < repeats) {
                 lr.load(info.req);
                 return;
             }
@@ -205,7 +203,7 @@ class GetUsersTask implements IGetUsersTask
             Syntax.code('}'); // for end
         }
         catch (err:Dynamic) {
-            if (info.repeats++ < requestRepeatTry) {
+            if (info.r++ < repeats) {
                 lr.load(info.req);
                 return;
             }
@@ -278,7 +276,7 @@ private typedef LoaderInfo =
     /**
      * Количество попыток резапроса.
      */
-    var repeats:Int;
+    var r:Int;
 
     /**
      * Параметры запроса.

@@ -23,21 +23,20 @@ class GetFriendsTask implements IGetFriendsTask
      */
     public function new(network:INetworkClient) {
         this.network = network;
-        this.requestRepeatTry = network.requestRepeatTry;
+        this.repeats = network.repeats;
     }
 
-    public var network(default, null):INetworkClient;
-    public var token:String = null;
-    public var user:UserID = null;
-    public var users:Array<UserID> = null;
-    public var error:Error = null;
-    public var requestRepeatTry:Int = 0;
-    public var priority:Int = 0;
-    public var onComplete:IGetFriendsTask->Void = null;
-    public var userData:Dynamic = null;
-
-    private var repeats:Int = 0;
+    public var network(default, null):INetworkClient    = null;
+    public var token(default, null):String              = null;
+    public var user(default, null):UserID               = null;
+    public var result(default, null):Array<UserID>      = null;
+    public var error(default, null):Error               = null;
+    public var repeats(default, null):Int               = 0;
+    public var priority(default, null):Int              = 0;
+    public var onComplete:IGetFriendsTask->Void         = null;
+    public var userData:Dynamic                         = null;
     private var lr:ILoader = #if nodejs null; #else new loader.jsonp.LoaderJSONP(); #end
+    private var r:Int = 0;
 
     public function start():Void {
         var req = new Request(network.apiURL + "friends.get");
@@ -62,7 +61,7 @@ class GetFriendsTask implements IGetFriendsTask
 
         // Сетевая ошибка:
         if (lr.error != null) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -76,7 +75,7 @@ class GetFriendsTask implements IGetFriendsTask
 
         // Пустой ответ:
         if (lr.data == null) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -107,7 +106,7 @@ class GetFriendsTask implements IGetFriendsTask
             }
 
             // Возможно, повторный запрос исправит проблему: (VK Иногда может тупить)
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -131,7 +130,7 @@ class GetFriendsTask implements IGetFriendsTask
                 arr[len] = NativeJS.str(arr[len]);
         }
         catch (err:Dynamic) {
-            if (repeats++ < requestRepeatTry) {
+            if (r++ < repeats) {
                 start();
                 return;
             }
@@ -155,13 +154,13 @@ class GetFriendsTask implements IGetFriendsTask
         // Очень редко, но иногда VK может возвращать пустой список друзей!
         // Для таких случаев мы переспросим VK не менее 5 раз, что бы наверняка
         // быть уверенными, что данный пользователь - ТОЧНО не имеет друзей.
-        if (arr.length == 0 && repeats++ < Math.max(5, requestRepeatTry)) {
+        if (arr.length == 0 && r++ < Math.max(5, repeats)) {
             start();
             return;
         }
 
         // Ответ успешно получен:
-        users = arr;
+        result = arr;
         if (onComplete != null)
             onComplete(this);
     }

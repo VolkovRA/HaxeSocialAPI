@@ -1,7 +1,6 @@
 package social.target.ok;
 
 import social.network.IPermissions;
-import social.utils.NativeJS;
 
 /**
  * Реализация списка прав доступа в Одноклассники.

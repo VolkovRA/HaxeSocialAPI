@@ -1,8 +1,6 @@
 package social.target.ok.sdk;
 
 import js.lib.Error;
-import haxe.Constraints.Function;
-import haxe.extern.Rest;
 import social.target.ok.objects.Attachment;
 import social.target.ok.objects.IFrameParams;
 

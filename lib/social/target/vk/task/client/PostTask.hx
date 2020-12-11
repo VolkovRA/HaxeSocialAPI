@@ -21,17 +21,17 @@ class PostTask implements IPostTask implements IPopup
         this.network = network;
     }
 
-    public var network(default, null):INetworkClient;
-    public var result:Bool = false;
-    public var message:String = null;
-    public var image:String = null;
-    public var url:String = null;
-    public var postID:String = null;
-    public var error:Error = null;
-    public var onComplete:IPostTask->Void = null;
-    public var userData:Dynamic = null;
-    private var popupIndex:Int = -1;
-    private var isCompleted:Bool = false;
+    public var network(default, null):INetworkClient    = null;
+    public var message(default, null):String            = null;
+    public var image(default, null):String              = null;
+    public var link(default, null):String               = null;
+    public var result(default, null):PostResult         = PostResult.UNKNOWN;
+    public var resultPostID(default, null):String       = null;
+    public var error(default, null):Error               = null;
+    public var userData:Dynamic                         = null;
+    public var onComplete:IPostTask->Void               = null;
+    private var isCompleted:Bool                        = false;
+    private var popupIndex:Int                          = -1;
 
     public function start():Void {
         network.popup.add(this);
@@ -45,8 +45,8 @@ class PostTask implements IPostTask implements IPopup
         var arr = [];
         if (image != null && image != "")
             arr.push(image);
-        if (url != null && url != "")
-            arr.push(url);
+        if (link != null && link != "")
+            arr.push(link);
 
         var params:Dynamic = { message: message };
         if (arr.length > 0)
@@ -63,7 +63,7 @@ class PostTask implements IPostTask implements IPopup
         network.popup.remove(this);
     }
 
-    private function onResult(result:Dynamic):Void {
+    private function onResult(data:Dynamic):Void {
         if (isCompleted)
             return;
 
@@ -75,34 +75,35 @@ class PostTask implements IPostTask implements IPopup
         // data.error.error_code // 10007, Operation denied by user
         
         // Пустой ответ: (Хз что это значит)
-        if (result == null) {
+        if (data == null) {
             if (onComplete != null)
                 onComplete(this);
             return;
         }
 
         // Наличие ошибки в ответе:
-        if (result.error != null) {
-            if (result.error.error_code == 10007) {
+        if (data.error != null) {
+            if (data.error.error_code == 10007) {
                 // Всё норм, это не ошибка, пользователь просто отменил пост:
+                result = PostResult.CANCELED;
                 if (onComplete != null)
                     onComplete(this);
                 return;
             }
 
             // Какая-то ошибка в VK:
-            error = new Error("Ошибка ВКонтакте при попытке размещения нового поста: " + result.error_msg);
+            error = new Error("Ошибка ВКонтакте при попытке размещения нового поста: " + data.error_msg);
             if (onComplete != null)
                 onComplete(this);
             return;
         }
 
         // Всё ок:
-        this.result = true;
+        result = PostResult.ACCEPTED;
 
         // Считываем ID поста:
-        if (result.response != null && result.response.post_id != null)
-            postID = NativeJS.str(result.response.post_id);
+        if (data.response != null && data.response.post_id != null)
+            resultPostID = NativeJS.str(data.response.post_id);
 
         // Завершаем вызов:
         if (onComplete != null)

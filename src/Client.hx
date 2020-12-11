@@ -57,7 +57,7 @@ class Client
                     return;
                 }
                 trace("Friends:");
-                trace(task.users);
+                trace(task.result);
             }, 10);
         };
 
@@ -83,14 +83,26 @@ class Client
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
         bt3.onclick = function(){
-            client.invite(null, "Го играть!1", function(task){ trace("Invite end", task.result, task.resultUsers); });
-            client.invite([], "Го играть!2", function(task){ trace("Invite end", task.result, task.resultUsers); });
-            client.invite([], "Го играть!3", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite(null, "Присоединяйся!", function(task) {
+                if (task.error != null) {
+                    trace(task.error);
+                    return;
+                }
+                trace("Приглашение завершено:", task.result, task.resultUsers);
+            });
         };
 
         var bt4 = Browser.document.createButtonElement();
         bt4.textContent = "Поделиться";
-        bt4.onclick = function(){ client.post("Заходите играть!\n\rhttps://vk.com/app7359309", "photo-192978621_457239019", "https://vk.com/app7359309", function(task){ trace("Post closed"); trace(task); }); };
+        bt4.onclick = function(){
+            client.post("Только посмотрите на это!", "photo-192978621_457239019", "https://vk.com/app7359309", function(task){
+                if (task.error != null) {
+                    trace(task.error);
+                    return;
+                }    
+                trace("Пост завершён:", task.result, task.resultPostID);
+            });
+        };
 
         Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(Browser.document.createBRElement());
@@ -109,7 +121,7 @@ class Client
                     return;
                 }
                 trace("Friends:");
-                trace(task.users);
+                trace(task.result);
             }, 10);
         };
 
@@ -135,14 +147,27 @@ class Client
         var bt3 = Browser.document.createButtonElement();
         bt3.textContent = "Пригласить друга";
         bt3.onclick = function(){
-            client.invite(null, "Го играть!1", function(task){ trace("Invite end", task.result, task.resultUsers); });
-            client.invite([], "Го играть!2", function(task){ trace("Invite end", task.result, task.resultUsers); });
-            client.invite([], "Го играть!3", function(task){ trace("Invite end", task.result, task.resultUsers); });
+            client.invite(null, "Присоединяйся!", function(task) {
+                if (task.error != null) {
+                    trace(task.error);
+                    return;
+                }
+                trace("Приглашение завершено:", task.result, task.resultUsers);
+            });
         };
 
         var bt4 = Browser.document.createButtonElement();
         bt4.textContent = "Поделиться";
-        bt4.onclick = function(){ client.post("Заходите играть!\n\rhttps://vk.com/app7359309", "photo-192978621_457239019", "https://vk.com/app7359309", function(task){ trace("Post closed"); trace(task); }); };
+        bt4.onclick = function(){ client.post("Заходите играть!", "", "https://vk.com/app7359309", function(task){ trace("Post closed"); trace(task); }); };
+        bt4.onclick = function(){
+            client.post("Только посмотрите на это!", "https://i.pinimg.com/originals/f4/d2/96/f4d2961b652880be432fb9580891ed62.png", "https://www.google.com", function(task){
+                if (task.error != null) {
+                    trace(task.error);
+                    return;
+                }
+                trace("Пост завершён:", task.result, task.resultPostID);
+            });
+        };
 
         Browser.document.body.appendChild(Browser.document.createBRElement());
         Browser.document.body.appendChild(Browser.document.createBRElement());

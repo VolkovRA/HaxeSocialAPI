@@ -18,6 +18,7 @@ import social.user.UserField;
  * @see Документация: https://vk.com/dev/manuals
  */
 @:dce
+@:access(social.task)
 class VKontakteServer extends VKontakte implements INetworkServer
 {
     /**
