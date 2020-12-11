@@ -30,7 +30,7 @@ interface IPostTask extends ITask<IPostTask, INetworkClient>
      * |Сеть|Пример|Документация|
      * |:-|:-|:-|
      * |`VK`| `photo-192978621_457239019` | https://vk.com/dev/wall.post |
-     * |`OK`| `123` | https://apiok.ru/dev/methods/rest/mediatopic/mediatopic.post |
+     * |`OK`| `https://mysite.com/logo.png` | https://apiok.ru/dev/methods/rest/mediatopic/mediatopic.post |
      * 
      * По умолчанию: `null`
      * 
