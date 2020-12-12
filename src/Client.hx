@@ -5,34 +5,24 @@ import js.lib.Error;
 
 class Client 
 {
-    // VK
     static private inline var VK_USER   = "626124000";
-    static private inline var VK_TOKEN  = "****";
-    // OK
-    static private inline var OK_USER   = "577631278162";
-    static private inline var OK_TOKEN  = "****";
-    // FB
-    static private inline var FB_USER   = "****";
-    static private inline var FB_TOKEN  = "****";
 
     private static var client:social.network.INetworkClient;
     static function main() {
         #if VK
         client = new social.target.vk.VKontakteClient();
-        client.token = VK_TOKEN;
         #elseif OK
         client = new social.target.ok.OdnoklassnikiClient();
-        client.token = OK_TOKEN;
         #elseif FB
         client = new social.target.fb.FacebookClient();
-        client.token = FB_TOKEN;
         #else
         throw new Error("Реализация интерфейса не указана");
         #end
 
         client.init({
             callback: onBrowserInit,
-            sdk: true, // <-- Требуется запуск внутри iframe на социальной сети.
+            sdk: true, // <-- Инициализировать SDK.
+            iframe: true, // <-- Чтение параметров из iframe.
         });
     }
     static private function onBrowserInit(error:Error):Void {
@@ -51,7 +41,7 @@ class Client
         var bt1 = Browser.document.createButtonElement();
         bt1.textContent = "Получить список друзей";
         bt1.onclick = function(){
-            client.getFriends(VK_USER, function(task) {
+            client.getFriends(client.user, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;
@@ -115,7 +105,7 @@ class Client
         var bt1 = Browser.document.createButtonElement();
         bt1.textContent = "Получить список друзей";
         bt1.onclick = function(){
-            client.getFriends(VK_USER, function(task) {
+            client.getFriends(client.user, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;

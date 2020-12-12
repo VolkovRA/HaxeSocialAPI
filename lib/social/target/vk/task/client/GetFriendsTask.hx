@@ -8,7 +8,9 @@ import social.task.client.IGetFriendsTask;
 import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
 import social.user.User;
+import social.utils.ErrorMessages;
 import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Реализация запроса списка друзей.
@@ -80,7 +82,7 @@ class GetFriendsTask implements IGetFriendsTask
                 return;
             }
 
-            error = new Error("Empty response of vk get friends");
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, ["get friends"]));
             if (onComplete != null)
                 onComplete(this);
 
@@ -135,14 +137,10 @@ class GetFriendsTask implements IGetFriendsTask
                 return;
             }
 
-            var msg:String = "Error read get friends vk response:\n";
-            if (err.message == null) {
-                error = new Error(msg + NativeJS.str(err));
-            }
-            else {
-                err.message = msg + NativeJS.str(err.message);
-                error = err;
-            } 
+            if (err.message == null)
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get friends", Std.string(err)]));
+            else
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get friends", err.message]));
 
             if (onComplete != null)
                 onComplete(this);

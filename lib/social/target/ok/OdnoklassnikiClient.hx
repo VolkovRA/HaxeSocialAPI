@@ -10,6 +10,7 @@ import social.task.client.IGetUsersTask;
 import social.task.client.IGetFriendsTask;
 import social.task.client.IInviteTask;
 import social.task.client.IPostTask;
+import social.target.ok.objects.IFrameParams;
 import social.target.ok.sdk.SDK;
 import social.target.ok.task.client.InviteTask;
 import social.target.ok.task.client.PostTask;
@@ -17,6 +18,9 @@ import social.user.User;
 import social.user.UserField;
 import social.popup.PopupManager;
 import social.utils.Dispatcher;
+import social.utils.ErrorMessages;
+import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Реализация интерфейса OK для клиентского приложения.  
@@ -51,7 +55,9 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     public var permissions(default, null)   = new Permissions();
     public var popup(default, null)         = new PopupManager();
     public var isInit(default, null)        = false;
+    public var user:UserID                  = null;
     public var token:String                 = null;
+    public var authkey:String               = null;
 
     public function init(?params:NetworkInitParams):Void {
         if (params == null)
@@ -60,12 +66,33 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
         // Интерфейс уже инициализирован:
         if (isInit) {
             if (params.callback != null)
-                params.callback(new Error("API Интерфейс для Одноклассников уже был инициализирован"));
+                params.callback(new Error(ErrorMessages.SOCIAL_ALREADY_INIT));
             return;
         }
 
         isInit = true;
         initParams = params;
+
+        // Инициализация iframe:
+        if (params.iframe) {
+            try {
+                iframe = parser.readIFrameParams();
+                if (iframe.apiconnection == null)       throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_APPID, ["apiconnection"]));
+                if (iframe.logged_user_id == null)      throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_USERID, ["logged_user_id"]));
+                if (iframe.session_secret_key == null)  throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_AUTHKEY, ["session_secret_key"]));
+                if (iframe.session_key == null)         throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_TOKEN, ["session_key"]));
+
+                appID = parser.readAppID(iframe.apiconnection);
+                user = NativeJS.str(iframe.logged_user_id);
+                authkey = iframe.session_secret_key;
+                token = iframe.session_key;
+            }
+            catch(err:Dynamic) {
+                if (params.callback != null)
+                    params.callback(new Error(ErrorMessages.IFRAME_READ_ERROR + "\n" + err.message));
+                return;
+            }
+        }
 
         // Инициализация SDK:
         if (params.sdk) {
@@ -100,7 +127,7 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
         initParams = null;
 
         if (f != null)
-            f(new Error("Ошибка загрузки JavaScript SDK для Одноклассники"));
+            f(new Error(ErrorMessages.SDK_LOAD_ERROR));
     }
     private function onSDKLoadComplete(e:Event):Void {
         sdkTag.removeEventListener("load", onSDKLoadComplete);
@@ -130,7 +157,7 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
         initParams = null;
 
         if (f != null)
-            f(new Error("Ошибка инициализации Одноклассники JavaScript SDK\n\r" + Std.string(error)));
+            f(new Error(ErrorMessages.SDK_INIT_ERROR + "\n" + Std.string(error)));
     }
 
     public function getUsers(   users:Array<User>,
@@ -208,6 +235,15 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     ////////////////////////////////
     //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
     ////////////////////////////////
+
+    /**
+     * Параметры iframe.  
+     * Это поле становится доступным после инициализации с
+     * переданным флагом `iframe`.
+     * 
+     * По умолчанию: `null`
+     */
+    public var iframe(default, null):IFrameParams = null;
 
     /**
      * Глобальный колбек обратного вызова для всех методов категорий UI.  

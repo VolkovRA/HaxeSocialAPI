@@ -10,7 +10,9 @@ import social.target.vk.objects.BaseError;
 import social.network.INetworkServer;
 import social.task.server.ISetLevelTask;
 import social.user.User;
+import social.utils.ErrorMessages;
 import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Реализация установки уровня игрока.
@@ -82,7 +84,7 @@ class SetLevelTask implements ISetLevelTask
                 start();
                 return;
             }
-            error = new Error("Получен пустой ответ от VK на запрос: secure.addAppEvent");
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, ["secure.addAppEvent"]));
             if (onComplete != null)
                 onComplete(this);
             return;
@@ -122,7 +124,7 @@ class SetLevelTask implements ISetLevelTask
                 start();
                 return;
             }
-            error = new Error("Получен некорректный ответ от VK: secure.addAppEvent");
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["secure.addAppEvent", Std.string(lr.data.response)]));
             if (onComplete != null)
                 onComplete(this);
             return;

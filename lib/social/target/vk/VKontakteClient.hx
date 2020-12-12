@@ -10,6 +10,7 @@ import social.task.client.IGetUsersTask;
 import social.task.client.IGetFriendsTask;
 import social.task.client.IInviteTask;
 import social.task.client.IPostTask;
+import social.target.vk.objects.IFrameParams;
 import social.target.vk.sdk.SDK;
 import social.target.vk.task.client.GetUsersTask;
 import social.target.vk.task.client.GetFriendsTask;
@@ -18,6 +19,9 @@ import social.target.vk.task.client.PostTask;
 import social.user.User;
 import social.user.UserField;
 import social.popup.PopupManager;
+import social.utils.ErrorMessages;
+import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Реализация интерфейса VK для клиентского приложения.  
@@ -52,7 +56,9 @@ class VKontakteClient extends VKontakte implements INetworkClient
     public var permissions(default, null)   = new Permissions();
     public var popup(default, null)         = new PopupManager();
     public var isInit(default, null)        = false;
+    public var user:UserID                  = null;
     public var token:String                 = null;
+    public var authkey:String               = null;
 
     public function init(?params:NetworkInitParams):Void {
         if (params == null)
@@ -61,12 +67,35 @@ class VKontakteClient extends VKontakte implements INetworkClient
         // Интерфейс уже инициализирован:
         if (isInit) {
             if (params.callback != null)
-                params.callback(new Error("API Интерфейс для ВКонтакте уже был инициализирован"));
+                params.callback(new Error(ErrorMessages.SOCIAL_ALREADY_INIT));
             return;
         }
         
         isInit = true;
         initParams = params;
+
+        // Инициализация iframe:
+        if (params.iframe) {
+            try {
+                iframe = parser.readIFrameParams();
+                if (iframe.api_id == null)         throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_APPID, ["api_id"]));
+                if (iframe.viewer_id == null)      throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_USERID, ["viewer_id"]));
+                if (iframe.auth_key == null)       throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_AUTHKEY, ["auth_key"]));
+                if (iframe.access_token == null)   throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_TOKEN, ["access_token"]));
+                if (iframe.api_settings == null)   throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_PERMISSIONS, ["api_settings"]));
+
+                appID = NativeJS.str(iframe.api_id);
+                user = NativeJS.str(iframe.viewer_id);
+                token = iframe.access_token;
+                authkey = iframe.auth_key;
+                permissions.mask = iframe.api_settings;
+            }
+            catch(err:Dynamic) {
+                if (params.callback != null)
+                    params.callback(new Error(ErrorMessages.IFRAME_READ_ERROR + "\n" + err.message));
+                return;
+            }
+        }
 
         // Инициализация SDK:
         if (params.sdk) {
@@ -101,7 +130,7 @@ class VKontakteClient extends VKontakte implements INetworkClient
         initParams = null;
 
         if (f != null)
-            f(new Error("Ошибка загрузки JavaScript SDK для ВКонтакте"));
+            f(new Error(ErrorMessages.SDK_LOAD_ERROR));
     }
     private function onSDKLoadComplete(e:Event):Void {
         sdkTag.removeEventListener("load", onSDKLoadComplete);
@@ -137,7 +166,7 @@ class VKontakteClient extends VKontakte implements INetworkClient
         initParams = null;
 
         if (f != null)
-            f(new Error("Ошибка инициализации ВКонтакте JavaScript SDK"));
+            f(new Error(ErrorMessages.SDK_INIT_ERROR));
     }
 
     public function getUsers(   users:Array<User>,
@@ -207,6 +236,15 @@ class VKontakteClient extends VKontakte implements INetworkClient
     ////////////////////////////////
     //   СОБСТВЕННАЯ РЕАЛИЗАЦИЯ   //
     ////////////////////////////////
+
+    /**
+     * Параметры iframe.  
+     * Это поле становится доступным после инициализации с
+     * переданным флагом `iframe`.
+     * 
+     * По умолчанию: `null`
+     */
+    public var iframe(default, null):IFrameParams = null;
 
     /**
      * Ссылка на JavaScript SDK.  

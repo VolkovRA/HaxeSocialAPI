@@ -2,10 +2,12 @@ package social.target.vk.task.client;
 
 import js.lib.Error;
 import social.network.INetworkClient;
+import social.popup.IPopup;
 import social.task.client.IPostTask;
 import social.target.vk.sdk.SDK;
+import social.utils.ErrorMessages;
 import social.utils.NativeJS;
-import social.popup.IPopup;
+import social.utils.Tools;
 
 /**
  * Реализация поста на стену.
@@ -92,7 +94,7 @@ class PostTask implements IPostTask implements IPopup
             }
 
             // Какая-то ошибка в VK:
-            error = new Error("Ошибка ВКонтакте при попытке размещения нового поста: " + data.error_msg);
+            error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [data.error_msg]));
             if (onComplete != null)
                 onComplete(this);
             return;

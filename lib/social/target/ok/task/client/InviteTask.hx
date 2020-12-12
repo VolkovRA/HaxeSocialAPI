@@ -6,6 +6,8 @@ import social.task.client.IInviteTask;
 import social.target.ok.sdk.SDK;
 import social.user.User;
 import social.popup.IPopup;
+import social.utils.ErrorMessages;
+import social.utils.Tools;
 
 /**
  * Реализация приглашения друзей.
@@ -46,9 +48,12 @@ class InviteTask implements IInviteTask implements IPopup
         var net:OdnoklassnikiClient = untyped network;
         if (method == "showInvite" && net.popup.current == this && !isCompleted) {
 
-            // Считываем ответ:
+            // Читаем ответ:
             this.result = net.parser.getInvitedResult(result);
-            this.resultUsers = net.parser.getInvitedResultUsers(data);
+            if (net.parser.isResultDataError(data))
+                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [Std.string(data)]));
+            else
+                this.resultUsers = net.parser.getInvitedResultUsers(data);
 
             // Завершаем задачу:
             isCompleted = true;

@@ -102,7 +102,7 @@ class VKontakteServer extends VKontakte implements INetworkServer
         #if nodejs
         return js.node.Crypto.createHash(js.node.Crypto.CryptoAlgorithm.MD5).update(appID + "_" + sid + "_" + secretKey).digest("hex") == key;
         #else
-        throw new js.lib.Error("Метод не реализован");
+        return false;
         #end
     }
 

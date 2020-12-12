@@ -1,11 +1,12 @@
 package social.target.ok.task.client;
 
-import social.utils.NativeJS;
 import js.lib.Error;
 import social.network.INetworkClient;
 import social.task.client.IPostTask;
 import social.target.ok.sdk.SDK;
 import social.popup.IPopup;
+import social.utils.ErrorMessages;
+import social.utils.Tools;
 
 /**
  * Реализация поста на стену.
@@ -84,7 +85,7 @@ class PostTask implements IPostTask implements IPopup
             // Читаем ответ:
             this.result = net.parser.getPostResult(result);
             if (net.parser.isResultDataError(data))
-                this.error = new Error(Std.string(data));
+                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [Std.string(data)]));
             else
                 this.resultPostID = net.parser.getPostResultPostID(data);
 

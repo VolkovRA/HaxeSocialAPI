@@ -7,6 +7,7 @@ import social.user.Sex;
 import social.user.User;
 import social.user.UserField;
 import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Парсер данных для ВКонтакте.
@@ -115,37 +116,18 @@ class Parser implements IParser
     ////////////////////////////////
 
     /**
-     * Распарсить параметры запроса iframe.  
-     * Просто передайте: `Browser.document.location.search`  
-     * Считывает строку и возвращает данные, которые передал VK.
-     * @param str Строка запроса с параметрами от VK. (То, что после символа "?" в URL)
-     * @return Объект параметров VK.
+     * Получить параметры iframe.  
+     * Считывает и возвращает параметры, переданные приложению в iframe.
+     * @return Параметры приложения.
      */
-    public function readIFrameParams(str:String):IFrameParams {
-        if (str == null)
-            return {};
-
-        var index = str.indexOf("?");
-        if (index > -1) {
-            str = str.substring(index + 1);
-        }
-
-        var arr = str.split("&");
-        str = null; // <-- Go to GC
-        var len = arr.length;
-        var map:Dynamic = {};
-        while (len-- != 0) {
-            index = arr[len].indexOf("=");
-            if (index == -1)
-                untyped map[NativeJS.decodeURI(arr[len])] = null;
-            else
-                untyped map[NativeJS.decodeURI(arr[len].substring(0, index))] = NativeJS.decodeURI(arr[len].substring(index + 1));
-        }
-        arr = null; // <-- Go to GC
-
+    public function readIFrameParams():IFrameParams {
+        #if nodejs
+        return null;
+        #else
+        var map = Tools.query(js.Browser.location.search);
         var data:IFrameParams = {};
 
-        // Максимально эффективный JavaScript
+        // Приведение к типу в соответствии с API (Маппинг)
         // String:
         if (map.api_url != null)        data.api_url = map.api_url;
         if (map.sid != null)            data.sid = map.sid;
@@ -171,6 +153,7 @@ class Parser implements IParser
         if (map.is_secure != null       && map.is_secure != "")         untyped data.is_secure          = NativeJS.parseInt(map.is_secure);
 
         return data;
+        #end
     }
 
     /**

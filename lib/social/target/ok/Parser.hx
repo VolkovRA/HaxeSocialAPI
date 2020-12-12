@@ -5,9 +5,11 @@ import social.user.OnlineType;
 import social.user.Sex;
 import social.user.User;
 import social.user.UserField;
-import social.utils.NativeJS;
+import social.target.ok.objects.IFrameParams;
 import social.task.client.IInviteTask;
 import social.task.client.IPostTask;
+import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Парсер данных для Одноклассников.
@@ -119,6 +121,67 @@ class Parser implements IParser
     ////////////////////////////////
 
     /**
+     * Получить параметры iframe.  
+     * Считывает и возвращает параметры, переданные приложению в iframe.
+     * @return Параметры приложения.
+     */
+    public function readIFrameParams():IFrameParams {
+        #if nodejs
+        return null;
+        #else
+        var map = Tools.query(js.Browser.location.search);
+        var data:IFrameParams = {};
+
+        // Приведение к типу в соответствии с API (Маппинг)
+        // String:
+        if (map.api_server != null)         data.api_server = map.api_server;
+        if (map.apiconnection != null)      data.apiconnection = map.apiconnection;
+        if (map.application_key != null)    data.application_key = map.application_key;
+        if (map.auth_sig != null)           data.auth_sig = map.auth_sig;
+        if (map.mob_platform != null)       data.mob_platform = map.mob_platform;
+        if (map.custom_args != null)        data.custom_args = map.custom_args;
+        if (map.header_widget != null)      data.header_widget = map.header_widget;
+        if (map.referer != null)            data.referer = map.referer;
+        if (map.refplace != null)           data.refplace = map.refplace;
+        if (map.session_key != null)        data.session_key = map.session_key;
+        if (map.session_secret_key != null) data.session_secret_key = map.session_secret_key;
+        if (map.sig != null)                data.sig = map.sig;
+        if (map.web_server != null)         data.web_server = map.web_server;
+        if (map.ip_geo_location != null)    data.ip_geo_location = map.ip_geo_location;
+
+        // Int:
+        if (map.authorized != null && map.authorized != "")         data.authorized = NativeJS.parseInt(map.authorized);
+        if (map.first_start != null && map.first_start != "")       data.first_start = NativeJS.parseInt(map.first_start);
+        if (map.logged_user_id != null && map.logged_user_id != "") data.logged_user_id = NativeJS.parseInt(map.logged_user_id);
+        
+        // Bool:
+        if (map.mob != null && map.mob != "")                                   data.mob = readBool(map.mob);
+        if (map.new_sig != null && map.new_sig != "")                           data.new_sig = readBool(map.new_sig);
+        if (map.container != null && map.container != "")                       data.container = readBool(map.container);
+        if (map.payment_promo_active != null && map.payment_promo_active != "") data.payment_promo_active = readBool(map.payment_promo_active);
+
+        return data;
+        #end
+    }
+
+    /**
+     * Прочитать ID приложения из параметров iframe.  
+     * @param apiconnection Свойство из iframe.
+     * @return ID Приложения.
+     */
+    public function readAppID(apiconnection:String):String {
+        // Пример: 1124642304_1607778743679
+        if (apiconnection == null)
+            return null;
+
+        var index = apiconnection.indexOf("_");
+        if (index == -1)
+            return apiconnection;
+
+        return apiconnection.substring(0, index);
+    }
+
+    /**
      * Прочитать результат вызова приглашения друзей.
      * @param result Результат вызова, полученный от Одноклассников.
      * @return Результат вызова в стандартизированном виде.
@@ -184,6 +247,19 @@ class Parser implements IParser
         if (obj == null)
             return false;
 
+        return true;
+    }
+
+    /**
+     * Прочитать логическое значение.
+     * @param value Строка с логическим значением.
+     * @return Логическое значение.
+     */
+    public function readBool(value:String):Bool {
+        if (value == null) return false;
+        if (value == "") return false;
+        if (value == "0") return false;
+        if (value.toLowerCase() == "false") return false;
         return true;
     }
 }

@@ -25,31 +25,31 @@ typedef IFrameParams =
     /**
      * Основной URL API-сервера, например: `https://api.ok.ru/`  
      */
-    var api_server:String;
+    @:optional var api_server:String;
 
     /**
      * Имя соединения.  
      */
-    var apiconnection:String;
+    @:optional var apiconnection:String;
 
     /**
      * Открытый ключ приложения.
      */
-    var application_key:String;
+    @:optional var application_key:String;
 
     /**
      * MD5-хеш параметров `logged_user_id+session_key+application_secret_key`  
      * Может использоваться для упрощенной проверки вошедшего в систему
      * пользователя.
      */
-    var auth_sig:String;
+    @:optional var auth_sig:String;
 
     /**
      * Пользователь авторизован.  
      * - `1` Если авторизован.
      * - `0` В ином случае.
      */
-    var authorized:Int;
+    @:optional var authorized:Int;
 
     /**
      * Будет передан со значением `true`, если приложение открыто внутри
@@ -98,7 +98,7 @@ typedef IFrameParams =
     /**
      * Идентификатор авторизованного пользователя, который является постоянным.
      */
-    var logged_user_id:Float;
+    @:optional var logged_user_id:Float;
 
     /**
      * Идентификатор способа, зависит от `refplace`  
@@ -114,17 +114,17 @@ typedef IFrameParams =
     /**
      * Ключ сессии пользователя в приложении.
      */
-    var session_key:String;
+    @:optional var session_key:String;
 
     /**
      * Секретный ключ сессии пользователя в приложении.
      */
-    var session_secret_key:String;
+    @:optional var session_secret_key:String;
 
     /**
      * MD5-хеш текущего запроса и `application_secret_key`
      */
-    var sig:String;
+    @:optional var sig:String;
 
     /**
      * Адрес веб-сервера Одноклассников, с которого запущена игра.

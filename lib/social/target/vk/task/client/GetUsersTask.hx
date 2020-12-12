@@ -11,7 +11,9 @@ import social.target.vk.enums.ErrorCode;
 import social.target.vk.objects.BaseError;
 import social.user.User;
 import social.user.UserField;
+import social.utils.ErrorMessages;
 import social.utils.NativeJS;
+import social.utils.Tools;
 
 /**
  * Реализация запроса данных пользователей.
@@ -138,7 +140,7 @@ class GetUsersTask implements IGetUsersTask
                 return;
             }
 
-            error = new Error("Empty response of vk get users");
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, ["get users"]));
             info.complete = true;
             checkComplete();
             return;
@@ -208,14 +210,10 @@ class GetUsersTask implements IGetUsersTask
                 return;
             }
 
-            var msg:String = "Error read get users vk response:\n";
-            if (err.message == null) {
-                error = new Error(msg + NativeJS.str(err));
-            }
-            else {
-                err.message = msg + NativeJS.str(err.message);
-                error = err;
-            } 
+            if (err.message == null)
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get users", Std.string(err)]));
+            else
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get users", err.message]));
 
             info.complete = true;
             checkComplete();
