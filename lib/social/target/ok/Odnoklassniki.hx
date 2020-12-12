@@ -47,10 +47,10 @@ class Odnoklassniki implements INetwork
             resultPostID: true,
         },
         setLevel: {
-            enabled: true,
+            enabled: false,
         },
         setScores: {
-            enabled: true,
+            enabled: false,
         },
         getUsersMax: 1000,
     };
