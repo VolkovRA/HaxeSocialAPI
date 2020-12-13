@@ -77,4 +77,19 @@ class Tools
         }
         return map;
     }
+
+    /**
+     * Получить текстовое представление ошибки.  
+     * Возвращает указанную ошибку в виде текста.
+     * @param error Ошибка.
+     * @return Текстовое описание ошибки.
+     */
+    static public function err(error:Dynamic):String {
+        if (error == null)
+            return null;
+        if (error.message == null)
+            return NativeJS.str(error);
+
+        return error.message;
+    }
 }

@@ -1,8 +1,10 @@
 package social.target.vk;
 
+import haxe.ds.IntMap;
 import loader.Balancer;
 import social.network.INetwork;
 import social.utils.Capabilities;
+import social.target.vk.enums.ErrorCode;
 
 /**
  * Базовый, абстрактный класс для реализации интерфейса ВКонтакте.  
@@ -14,6 +16,11 @@ import social.utils.Capabilities;
 class VKontakte implements INetwork
 {
     public function new() {
+        apiFatalErrors.set(ErrorCode.PRIVATE_USER, true);
+        apiFatalErrors.set(ErrorCode.USER_DEACTIVATED, true);
+        apiFatalErrors.set(ErrorCode.USER_REMOVED, true);
+        apiFatalErrors.set(ErrorCode.WRONG_VALUE, true);
+        apiFatalErrors.set(ErrorCode.AUTHORISATION_FAILED, true);
     }
 
 
@@ -28,6 +35,7 @@ class VKontakte implements INetwork
     public var type(default, null)          = NetworkType.VK;
     public var parser(default, null)        = new Parser();
     public var balancer(default, null)      = new Balancer(3);
+    public var apiFatalErrors               = new IntMap();
     public var appID:String                 = null;
     public var repeats                      = 2;
     public var capabilities(default, null):Capabilities = {

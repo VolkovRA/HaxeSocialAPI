@@ -13,7 +13,6 @@ import social.target.vk.objects.BaseError;
 import social.user.User;
 import social.user.UserField;
 import social.utils.ErrorMessages;
-import social.utils.NativeJS;
 import social.utils.Tools;
 
 /**
@@ -24,8 +23,8 @@ import social.utils.Tools;
 class GetUsersTask implements IGetUsersTask 
 {
     /**
-     * Создать задачу запроса данных пользователей.
-     * @param network Реализация соц. сети VK.
+     * Создать задачу.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkServer) {
         this.network = network;
@@ -39,6 +38,7 @@ class GetUsersTask implements IGetUsersTask
     public var error(default, null):Error               = null;
     public var repeats(default, null):Int               = 0;
     public var priority(default, null):Int              = 0;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:IGetUsersTask->Void           = null;
     public var onProgress:IGetUsersTask->DynamicAccess<User>->Void = null;
@@ -106,29 +106,31 @@ class GetUsersTask implements IGetUsersTask
     }
 
     public function cancel():Void {
-        if (loaders == null)
+        if (isComplete)
             return;
 
-        var arr = loaders;
-        var i = arr.length;
-        
-        loaders = null;
+        isComplete = true;
 
-        while (i-- > 0)
-            arr[i].purge();
+        if (loaders != null) {
+            var arr = loaders;
+            var i = arr.length;
+            loaders = null;
+            while (i-- > 0)
+                arr[i].purge();
+        }
     }
 
     private function onResponse(lr:ILoader):Void {
         var info:LoaderInfo = lr.userData;
 
-        // Сетевая ошибка:
+        // Разбор ответа
+        // Сетевая ошибка или некорректный формат ответ:
         if (lr.error != null) {
             if (info.r++ < repeats) {
                 lr.load(info.req);
                 return;
             }
-
-            error = lr.error;
+            error = new Error(Tools.msg(ErrorMessages.REQUEST_ERROR, [network.apiURL + "users.get", Tools.err(lr.error)]));
             info.complete = true;
             checkComplete();
             return;
@@ -140,50 +142,36 @@ class GetUsersTask implements IGetUsersTask
                 lr.load(info.req);
                 return;
             }
-
-            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, ["get users"]));
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, [network.apiURL + "users.get"]));
             info.complete = true;
             checkComplete();
             return;
         }
 
-        // Ошибки VK:
+        // Ошибки API:
         var errors:BaseError = lr.data.error;
         if (errors != null) {
 
             // 113 - Частный случай НЕ ошибки:
             if (errors.error_code == ErrorCode.WRONG_USER_ID) {
-
                 // При запросе только 1 пользователя, если он не существует - возвращает эту ошибку.
                 // При запросе нескольких пользователей возвращает просто пустой ответ без ошибки.
                 // По сути, это не ошибка, просто пользователя не существует!
-
                 network.parser.readUser(null, getFirstMapItem(info.users), fields);
                 info.complete = true;
                 checkComplete();
                 return;
             }
 
-            // Неисправимые ошибки: (Повторный запрос - бесполезен)
-            if (    errors.error_code == ErrorCode.AUTHORISATION_FAILED ||
-                    errors.error_code == ErrorCode.WRONG_VALUE
-            ) {
-                error = new Error(errors.error_msg);
+            // Остальные:
+            if (info.r++ < repeats && !network.apiFatalErrors.get(errors.error_code)) {
+                lr.load(info.req);
+            }
+            else {
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_ERROR, [network.apiURL + "users.get", errors.error_code, errors.error_msg]));
                 info.complete = true;
                 checkComplete();
-                return;
             }
-
-            // Возможно, повторный запрос исправит проблему: (VK Иногда может тупить)
-            if (info.r++ < repeats) {
-                lr.load(info.req);
-                return;
-            }
-
-            // Всё - хуйня приехали:
-            error = new Error(errors.error_msg);
-            info.complete = true;
-            checkComplete();
             return;
         }
 
@@ -210,18 +198,13 @@ class GetUsersTask implements IGetUsersTask
                 lr.load(info.req);
                 return;
             }
-
-            if (err.message == null)
-                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get users", Std.string(err)]));
-            else
-                error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["get users", err.message]));
-
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, [network.apiURL + "users.get", Tools.err(err)]));
             info.complete = true;
             checkComplete();
             return;
         }
 
-        // Ответ успешно разобран:
+        // Всё ок:
         info.complete = true;
         if (onProgress != null)
             onProgress(this, info.users);
@@ -235,13 +218,9 @@ class GetUsersTask implements IGetUsersTask
             if (!info.complete)
                 return;
         }
-
         cancel();
-
-        var f = onComplete;
-        onComplete = null;
-        if (f != null)
-            f(this);
+        if (onComplete != null)
+            onComplete(this);
     }
 
     static private function getUsersIDS(map:DynamicAccess<User>):String {

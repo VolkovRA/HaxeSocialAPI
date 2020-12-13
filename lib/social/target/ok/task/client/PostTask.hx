@@ -16,7 +16,7 @@ class PostTask implements IPostTask implements IPopup
 {
     /**
      * Создать задачу.
-     * @param network Интерфейс социальной сети.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkClient) {
         this.network = network;
@@ -29,10 +29,10 @@ class PostTask implements IPostTask implements IPopup
     public var result(default, null):PostResult         = PostResult.UNKNOWN;
     public var resultPostID(default, null):String       = null;
     public var error(default, null):Error               = null;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:IPostTask->Void               = null;
     private var popupIndex:Int                          = -1;
-    private var isCompleted:Bool                        = false;
 
     public function start():Void {
         network.popup.add(this);
@@ -71,29 +71,31 @@ class PostTask implements IPostTask implements IPopup
     }
 
     public function cancel():Void {
-        if (isCompleted)
+        if (isComplete)
             return;
 
-        isCompleted = true;
-        network.popup.remove(this);
+        isComplete = true;
+
+        var net:OdnoklassnikiClient = untyped network;
+        net.onUIResult.off(onUIResult);
+        net.popup.remove(this);
     }
 
-    private function onUIResult(method:String, result:String, data:Dynamic) {
+    private function onUIResult(method:String, result:String, data:Dynamic):Void {
         var net:OdnoklassnikiClient = untyped network;
-        if (method == "postMediatopic" && net.popup.current == this && !isCompleted) {
+        if (method == "postMediatopic" && net.popup.current == this && !isComplete) {
 
             // Читаем ответ:
             this.result = net.parser.getPostResult(result);
             if (net.parser.isResultDataError(data))
-                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [Std.string(data)]));
+                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, ["postMediatopic", Std.string(data)]));
             else
                 this.resultPostID = net.parser.getPostResultPostID(data);
 
             // Завершаем задачу:
-            isCompleted = true;
+            isComplete = true;
             net.onUIResult.off(onUIResult);
             net.popup.remove(this);
-
             if (onComplete != null)
                 onComplete(this);
         }

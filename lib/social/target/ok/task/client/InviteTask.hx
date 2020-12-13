@@ -17,7 +17,7 @@ class InviteTask implements IInviteTask implements IPopup
 {
     /**
      * Создать задачу.
-     * @param network Интерфейс социальной сети.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkClient) {
         this.network = network;
@@ -29,10 +29,10 @@ class InviteTask implements IInviteTask implements IPopup
     public var error(default, null):Error               = null;
     public var result(default, null):InviteResult       = InviteResult.UNKNOWN;
     public var resultUsers(default, null):Array<UserID> = null;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:IInviteTask->Void             = null;
     private var popupIndex:Int                          = -1;
-    private var isCompleted:Bool                        = false;
 
     public function start():Void {
         network.popup.add(this);
@@ -44,35 +44,35 @@ class InviteTask implements IInviteTask implements IPopup
         SDK.UI.showInvite(message, null, users==null?null:users.join(";"));
     }
 
-    private function onUIResult(method:String, result:String, data:Dynamic) {
+    private function onUIResult(method:String, result:String, data:Dynamic):Void {
         var net:OdnoklassnikiClient = untyped network;
-        if (method == "showInvite" && net.popup.current == this && !isCompleted) {
+        if (method == "showInvite" && net.popup.current == this && !isComplete) {
 
             // Читаем ответ:
             this.result = net.parser.getInvitedResult(result);
             if (net.parser.isResultDataError(data))
-                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [Std.string(data)]));
+                this.error = new Error(Tools.msg(ErrorMessages.UI_ERROR, ["showInvite", Std.string(data)]));
             else
                 this.resultUsers = net.parser.getInvitedResultUsers(data);
 
             // Завершаем задачу:
-            isCompleted = true;
+            isComplete = true;
             net.onUIResult.off(onUIResult);
             net.popup.remove(this);
-
             if (onComplete != null)
                 onComplete(this);
         }
     }
 
     public function cancel():Void {
-        if (isCompleted)
+        if (isComplete)
             return;
+
+        isComplete = true;
 
         var net:OdnoklassnikiClient = untyped network;
         net.onUIResult.off(onUIResult);
         net.popup.remove(this);
-        isCompleted = true;
     }
 
     @:keep

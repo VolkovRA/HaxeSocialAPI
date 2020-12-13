@@ -1,5 +1,6 @@
 package social.network;
 
+import haxe.ds.IntMap;
 import loader.Balancer;
 import social.utils.Capabilities;
 
@@ -61,6 +62,18 @@ interface INetwork
      * Может быть `null`
      */
     public var apiVersion(default, null):String;
+
+    /**
+     * Фатальные коды ошибок в ответе API.  
+     * Используется при повторных попытках запроса к API социальной сети.
+     * При наличий в ответе одного из этих кодов, повторный запрос
+     * не выполняется, так как считается, что это будет бесполезно.
+     * 
+     * *п.с. Каждая соц. сеть имеет собственные коды ошибок.*
+     * 
+     * Не может быть `null`
+     */
+    public var apiFatalErrors(default, null):IntMap<Bool>;
 
     /**
      * ID Приложения.  

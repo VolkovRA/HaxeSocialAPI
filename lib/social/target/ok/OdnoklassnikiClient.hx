@@ -14,6 +14,8 @@ import social.target.ok.objects.IFrameParams;
 import social.target.ok.sdk.SDK;
 import social.target.ok.task.client.InviteTask;
 import social.target.ok.task.client.PostTask;
+//import social.target.ok.task.client.GetUsersTask;
+import social.target.ok.task.client.GetFriendsTask;
 import social.user.User;
 import social.user.UserField;
 import social.popup.PopupManager;
@@ -81,11 +83,13 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
                 if (iframe.logged_user_id == null)      throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_USERID, ["logged_user_id"]));
                 if (iframe.session_secret_key == null)  throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_AUTHKEY, ["session_secret_key"]));
                 if (iframe.session_key == null)         throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_TOKEN, ["session_key"]));
+                if (iframe.application_key == null)     throw new Error(Tools.msg(ErrorMessages.IFRAME_NO_TOKEN, ["application_key"]));
 
                 appID = parser.readAppID(iframe.apiconnection);
                 user = NativeJS.str(iframe.logged_user_id);
                 authkey = iframe.session_secret_key;
                 token = iframe.session_key;
+                applicationKey = iframe.application_key;
             }
             catch(err:Dynamic) {
                 if (params.callback != null)
@@ -186,7 +190,6 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
                                 onComplete:IGetFriendsTask->Void = null,
                                 priority:Int = 0
     ):IGetFriendsTask {
-        /*
         var task:IGetFriendsTask = new GetFriendsTask(this);
         task.user               = user;
         task.token              = token;
@@ -194,8 +197,6 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
         task.priority           = priority;
         task.start();
         return task;
-        */
-        return null;
     }
 
     public function invite( users:Array<UserID> = null,

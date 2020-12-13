@@ -17,7 +17,7 @@ class PostTask implements IPostTask implements IPopup
 {
     /**
      * Создать задачу.
-     * @param network Реализация соц. сети VK.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkClient) {
         this.network = network;
@@ -30,9 +30,9 @@ class PostTask implements IPostTask implements IPopup
     public var result(default, null):PostResult         = PostResult.UNKNOWN;
     public var resultPostID(default, null):String       = null;
     public var error(default, null):Error               = null;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:IPostTask->Void               = null;
-    private var isCompleted:Bool                        = false;
     private var popupIndex:Int                          = -1;
 
     public function start():Void {
@@ -58,18 +58,17 @@ class PostTask implements IPostTask implements IPopup
     }
 
     public function cancel():Void {
-        if (isCompleted)
+        if (isComplete)
             return;
 
-        isCompleted = true;
+        isComplete = true;
         network.popup.remove(this);
     }
 
     private function onResult(data:Dynamic):Void {
-        if (isCompleted)
+        if (isComplete)
             return;
 
-        isCompleted = true;
         network.popup.remove(this);
 
         // Пытаемься прочитать ответ:
@@ -78,6 +77,7 @@ class PostTask implements IPostTask implements IPopup
         
         // Пустой ответ: (Хз что это значит)
         if (data == null) {
+            isComplete = true;
             if (onComplete != null)
                 onComplete(this);
             return;
@@ -88,13 +88,15 @@ class PostTask implements IPostTask implements IPopup
             if (data.error.error_code == 10007) {
                 // Всё норм, это не ошибка, пользователь просто отменил пост:
                 result = PostResult.CANCELED;
+                isComplete = true;
                 if (onComplete != null)
                     onComplete(this);
                 return;
             }
 
             // Какая-то ошибка в VK:
-            error = new Error(Tools.msg(ErrorMessages.UI_ERROR, [data.error_msg]));
+            error = new Error(Tools.msg(ErrorMessages.UI_ERROR, ["wall.post", data.error_msg]));
+            isComplete = true;
             if (onComplete != null)
                 onComplete(this);
             return;
@@ -108,6 +110,7 @@ class PostTask implements IPostTask implements IPopup
             resultPostID = NativeJS.str(data.response.post_id);
 
         // Завершаем вызов:
+        isComplete = true;
         if (onComplete != null)
             onComplete(this);
     }

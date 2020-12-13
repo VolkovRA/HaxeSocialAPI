@@ -5,8 +5,6 @@ import js.lib.Error;
 
 class Client 
 {
-    static private inline var VK_USER   = "626124000";
-
     private static var client:social.network.INetworkClient;
     static function main() {
         #if VK

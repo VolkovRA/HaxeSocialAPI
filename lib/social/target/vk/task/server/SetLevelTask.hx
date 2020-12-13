@@ -5,9 +5,8 @@ import loader.DataFormat;
 import loader.ILoader;
 import loader.Method;
 import loader.Request;
-import social.target.vk.enums.ErrorCode;
-import social.target.vk.objects.BaseError;
 import social.network.INetworkServer;
+import social.target.vk.objects.BaseError;
 import social.task.server.ISetLevelTask;
 import social.user.User;
 import social.utils.ErrorMessages;
@@ -22,7 +21,7 @@ class SetLevelTask implements ISetLevelTask
 {
     /**
      * Создать задачу.
-     * @param network Реализация соц. сети VK.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkServer) {
         this.network = network;
@@ -36,6 +35,7 @@ class SetLevelTask implements ISetLevelTask
     public var level(default, null):Int                 = 0;
     public var priority(default, null):Int              = 0;
     public var repeats(default, null):Int               = 0;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:ISetLevelTask->Void           = null;
     private var r:Int                                   = 0;
@@ -57,22 +57,30 @@ class SetLevelTask implements ISetLevelTask
     }
 
     public function cancel():Void {
-        lr.onComplete = null;
-        lr.balancer = null;
-        lr.close();
-        lr = null;
+        if (isComplete)
+            return;
+
+        isComplete = true;
+
+        if (lr != null) {
+            lr.onComplete = null;
+            lr.balancer = null;
+            lr.close();
+            lr = null;
+        }
     }
 
     private function onResponse(lr:ILoader):Void {
-        
-        // Разбор ответа.
-        // Сетевая ошибка:
+
+        // Разбор ответа
+        // Сетевая ошибка или некорректный формат ответ:
         if (lr.error != null) {
             if (r++ < repeats) {
                 start();
                 return;
             }
-            error = lr.error;
+            error = new Error(Tools.msg(ErrorMessages.REQUEST_ERROR, [network.apiURL + "secure.addAppEvent", Tools.err(lr.error)]));
+            isComplete = true;
             if (onComplete != null)
                 onComplete(this);
             return;
@@ -84,53 +92,43 @@ class SetLevelTask implements ISetLevelTask
                 start();
                 return;
             }
-            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, ["secure.addAppEvent"]));
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, [network.apiURL + "secure.addAppEvent"]));
+            isComplete = true;
             if (onComplete != null)
                 onComplete(this);
             return;
         }
 
-        // Ошибки VK:
+        // Ошибки API:
         var errors:BaseError = lr.data.error;
         if (errors != null) {
-            // Неисправимые ошибки: (Повторный запрос - бесполезен)
-            if (    errors.error_code == ErrorCode.USER_DEACTIVATED ||
-                    errors.error_code == ErrorCode.USER_REMOVED ||
-                    errors.error_code == ErrorCode.WRONG_VALUE ||
-                    errors.error_code == ErrorCode.AUTHORISATION_FAILED
-            ) {
-                error = new Error(errors.error_msg);
+            if (r++ < repeats && !network.apiFatalErrors.get(errors.error_code)) {
+                start();
+            }
+            else {
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_ERROR, [network.apiURL + "secure.addAppEvent", errors.error_code, errors.error_msg]));
+                isComplete = true;
                 if (onComplete != null)
                     onComplete(this);
-                return;
             }
-
-            // Возможно, повторный запрос исправит проблему: (VK Иногда может тупить)
-            if (r++ < repeats) {
-                start();
-                return;
-            }
-
-            // Всё - хуйня приехали:
-            error = new Error(errors.error_msg);
-            if (onComplete != null)
-                onComplete(this);
             return;
         }
 
-        // Должен быть конкретный ответ:
+        // Разбор ответа:
         if (lr.data.response != 1) {
             if (r++ < repeats) {
                 start();
                 return;
             }
-            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, ["secure.addAppEvent", Std.string(lr.data.response)]));
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, [network.apiURL + "secure.addAppEvent", Std.string(lr.data.response)]));
+            isComplete = true;
             if (onComplete != null)
                 onComplete(this);
             return;
         }
 
         // Всё ок:
+        isComplete = true;
         if (onComplete != null)
             onComplete(this);
     }

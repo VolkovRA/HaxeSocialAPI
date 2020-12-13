@@ -57,17 +57,27 @@ class ErrorMessages
     static public var SDK_INIT_ERROR = 'Ошибка инициализации JavaScript SDK для интеграции с API социальной сети';
 
     /**
+     * Ошибка запроса к социальной сети.
+     */
+    static public var REQUEST_ERROR = 'Ошибка запроса к API социальной сети: {0}\n{1}';
+
+    /**
      * Получен пустой ответ на запрос.
      */
-    static public var RESPONSE_EMPTY = 'Получен пустой ответ на запрос "{0}"';
+    static public var RESPONSE_EMPTY = 'Получен пустой ответ на запрос к API социальной сети: {0}';
 
     /**
      * Получен некоректный ответ на запрос.
      */
-    static public var RESPONSE_WRONG = 'Получен некоректный ответ на запрос "{0}"\n{1}';
+    static public var RESPONSE_WRONG = 'Получен некорректный ответ на запрос к API социальной сети: {0}\n{1}';
+
+    /**
+     * Получена ошибка в ответе на запрос.
+     */
+    static public var RESPONSE_ERROR = 'Получена ошибка в ответе на запрос к API социальной сети: {0}\nКод ошибки: {1}, {2}';
 
     /**
      * Ошибка вызова диалогового окна социальной сети.
      */
-    static public var UI_ERROR = 'Ошибка вызова диалогового окна социальной сети\n{0}';
+    static public var UI_ERROR = 'Ошибка вызова диалогового окна JS SDK API социальной сети: {0}\n{1}';
 }

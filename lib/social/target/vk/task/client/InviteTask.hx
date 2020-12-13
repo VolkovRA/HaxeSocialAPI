@@ -17,7 +17,7 @@ class InviteTask implements IInviteTask implements IPopup
 {
     /**
      * Создать задачу.
-     * @param network Реализация соц. сети VK.
+     * @param network Реализация интерфейса социальной сети.
      */
     public function new(network:INetworkClient) {
         this.network = network;
@@ -29,10 +29,10 @@ class InviteTask implements IInviteTask implements IPopup
     public var error(default, null):Error               = null;
     public var result(default, null):InviteResult       = InviteResult.UNKNOWN;
     public var resultUsers(default, null):Array<UserID> = null;
+    public var isComplete(default, null):Bool           = false;
     public var userData:Dynamic                         = null;
     public var onComplete:IInviteTask->Void             = null;
     private var popupIndex:Int                          = -1;
-    private var isCompleted:Bool                        = false;
 
     public function start():Void {
         network.popup.add(this);
@@ -44,16 +44,19 @@ class InviteTask implements IInviteTask implements IPopup
     }
 
     public function cancel():Void {
-        if (isCompleted)
+        if (isComplete)
             return;
 
-        isCompleted = true;
+        isComplete = true;
         network.popup.remove(this);
         SDK.removeCallback(Event.WINDOW_FOCUS, onFocus);
     }
 
     private function onFocus():Void {
-        isCompleted = true;
+        if (isComplete)
+            return;
+
+        isComplete = true;
         network.popup.remove(this);
         SDK.removeCallback(Event.WINDOW_FOCUS, onFocus);
         if (onComplete != null)

@@ -1,6 +1,8 @@
 package social.target.ok;
 
+import haxe.ds.IntMap;
 import loader.Balancer;
+import social.target.ok.enums.ErrorCode;
 import social.network.INetwork;
 import social.utils.Capabilities;
 
@@ -14,6 +16,10 @@ import social.utils.Capabilities;
 class Odnoklassniki implements INetwork
 {
     public function new() {
+        apiFatalErrors.set(ErrorCode.IP_BLOCKED, true);
+        apiFatalErrors.set(ErrorCode.PARAM, true);
+        apiFatalErrors.set(ErrorCode.PARAM_API_KEY, true);
+        apiFatalErrors.set(ErrorCode.PARAM_SESSION_KEY, true);
     }
 
 
@@ -28,6 +34,7 @@ class Odnoklassniki implements INetwork
     public var type(default, null)          = NetworkType.OK;
     public var parser(default, null)        = new Parser();
     public var balancer(default, null)      = new Balancer(3);
+    public var apiFatalErrors               = new IntMap();
     public var appID:String                 = null;
     public var repeats                      = 2;
     public var capabilities(default, null):Capabilities = {
@@ -54,6 +61,15 @@ class Odnoklassniki implements INetwork
         },
         getUsersMax: 1000,
     };
+
+    /**
+     * Публичный ключ приложения в Одноклассниках.  
+     * По сути, это второй ID. Используется для запросов к API.
+     * Может быть получен из iframe параметров или указан вручную.
+     * 
+     * По умолчанию: `null`
+     */
+    public var applicationKey:String = null;
 
     @:keep
     @:noCompletion
