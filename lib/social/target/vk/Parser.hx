@@ -41,18 +41,83 @@ class Parser implements IParser
             if (NativeJS.flagsOR(fields, UserField.ONLINE))          user.online = null;
         }
         else {
-            if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))      user.firstName = data.first_name;
-            if (NativeJS.flagsOR(fields, UserField.LAST_NAME))       user.lastName = data.last_name;
+            if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))      user.firstName = readUserFirstName(data);
+            if (NativeJS.flagsOR(fields, UserField.LAST_NAME))       user.lastName = readUserLastName(data);
             if (NativeJS.flagsOR(fields, UserField.DELETED))         user.deleted = readUserDeleted(data);
             if (NativeJS.flagsOR(fields, UserField.BANNED))          user.banned = readUserBanned(data);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_50))       user.avatar50 = readUserPhoto(data.photo_50);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_100))      user.avatar100 = readUserPhoto(data.photo_100);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_200))      user.avatar200 = readUserPhoto(data.photo_200);
-            if (NativeJS.flagsOR(fields, UserField.HOME))            user.home = readHome(data.domain);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_50))       user.avatar50 = readUserPhoto50(data);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_100))      user.avatar100 = readUserPhoto100(data);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_200))      user.avatar200 = readUserPhoto200(data);
+            if (NativeJS.flagsOR(fields, UserField.HOME))            user.home = readUserHome(data);
             if (NativeJS.flagsOR(fields, UserField.SEX))             user.sex = readUserSex(data);
             if (NativeJS.flagsOR(fields, UserField.ONLINE))          user.online = readUserOnline(data);
         }
         user.dateUpdated = NativeJS.stamp();
+    }
+
+    public function readUserFirstName(data:Dynamic):String {
+        if (data.first_name == null)    return null;
+        if (data.first_name == "")      return null;
+        return NativeJS.str(data.first_name);
+    }
+
+    public function readUserLastName(data:Dynamic):String {
+        if (data.last_name == null)     return null;
+        if (data.last_name == "")       return null;
+        return NativeJS.str(data.last_name);
+    }
+
+    public function readUserDeleted(data:Dynamic):Bool {
+        if (data.deactivated == "deleted")
+            return true;
+
+        return false;
+    }
+
+    public function readUserBanned(data:Dynamic):Bool {
+        if (data.deactivated == "banned")
+            return true;
+
+        return false;
+    }
+
+    public function readUserPhoto50(data:Dynamic):String {
+        if (data.photo_50 == null)  return null;
+        if (data.photo_50 == "")    return null;
+
+        var str = NativeJS.str(data.photo_50);
+        if (isPhotoWrong(str))      return null;
+        return str;
+    }
+
+    public function readUserPhoto100(data:Dynamic):String {
+        if (data.photo_100 == null) return null;
+        if (data.photo_100 == "")   return null;
+
+        var str = NativeJS.str(data.photo_100);
+        if (isPhotoWrong(str))      return null;
+        return str;
+    }
+
+    public function readUserPhoto200(data:Dynamic):String {
+        if (data.photo_200 == null) return null;
+        if (data.photo_200 == "")   return null;
+
+        var str = NativeJS.str(data.photo_200);
+        if (isPhotoWrong(str))      return null;
+        return str;
+    }
+
+    public function readUserHome(data:Dynamic):String {
+        if (data.domain == null)    return null;
+        if (data.domain == "")      return null;
+        return "https://vk.com/" + NativeJS.str(data.domain);
+    }
+
+    public function readUserSex(data:Dynamic):Sex {
+        if (data.sex == 1)  return Sex.FEMALE;
+        if (data.sex == 2)  return Sex.MALE;
+        return Sex.UNKNOWN;
     }
 
     public function readUserOnline(data:Dynamic):OnlineType {
@@ -64,43 +129,6 @@ class Parser implements IParser
         }
 
         return OnlineType.OFFLINE;
-    }
-
-    public function readUserPhoto(data:Dynamic):String {
-        var str = NativeJS.str(data);
-
-        // Невалидные данные:
-        if (str.indexOf("vk.com/images/deactivated") != -1) return null;    // https://vk.com/images/deactivated_50.png
-        if (str.indexOf("vk.com/images/camera") != -1) return null;         // https://vk.com/images/camera_50.png?ava=1
-
-        return str;
-    }
-
-    public function readHome(data:Dynamic):String {
-        return "https://vk.com/" + NativeJS.str(data);
-    }
-
-    public function readUserBanned(data:Dynamic):Bool {
-        if (data.deactivated == 'banned')
-            return true;
-
-        return false;
-    }
-
-    public function readUserDeleted(data:Dynamic):Bool {
-        if (data.deactivated == 'deleted')
-            return true;
-
-        return false;
-    }
-
-    public function readUserSex(data:Dynamic):Sex {
-        if (data.sex == 1)
-            return Sex.FEMALE;
-        if (data.sex == 2)
-            return Sex.MALE;
-
-        return Sex.UNKNOWN;
     }
 
     @:keep
@@ -180,5 +208,19 @@ class Parser implements IParser
             return str;
 
         return str.substring(0, str.length - 1);
+    }
+
+    /**
+     * Проверка URL адреса аватарки на корректность.  
+     * Если у пользователя нет аватарки, VK возвращает хуйню.
+     * Этот метод возвращает `true`, если переданный URL содержит
+     * не настоящее фото или заглушку.
+     * @param url URL Адрес аватарки.
+     * @return Заглушка или некорректная аватарка пользователя.
+     */
+    public function isPhotoWrong(url:String):Bool {
+        if (url.indexOf("vk.com/images/deactivated") != -1) return true;    // https://vk.com/images/deactivated_50.png
+        if (url.indexOf("vk.com/images/camera") != -1)      return true;    // https://vk.com/images/camera_50.png?ava=1
+        return false;
     }
 }

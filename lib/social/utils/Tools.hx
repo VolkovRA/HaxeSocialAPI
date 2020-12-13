@@ -1,5 +1,7 @@
 package social.utils;
 
+import social.user.UserField;
+
 /**
  * Вспомогательные утилиты.  
  * Статический класс.
@@ -88,8 +90,26 @@ class Tools
         if (error == null)
             return null;
         if (error.message == null)
-            return NativeJS.str(error);
+            return Std.string(error);
 
         return error.message;
+    }
+
+    /**
+     * Получить перечисление всех полей пользователя.
+     * @return Маска с перечислением всех доступных полей пользователя.
+     */
+    static public inline function getAllUserFields():UserFields {
+        return
+            UserField.FIRST_NAME |
+            UserField.LAST_NAME |
+            UserField.DELETED |
+            UserField.BANNED |
+            UserField.AVATAR_50 |
+            UserField.AVATAR_100 |
+            UserField.AVATAR_200 |
+            UserField.HOME |
+            UserField.SEX |
+            UserField.ONLINE;
     }
 }

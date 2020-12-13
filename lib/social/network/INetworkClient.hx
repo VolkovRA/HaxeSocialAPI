@@ -112,8 +112,7 @@ interface INetworkClient extends INetwork
      * Запросить данные пользователей.  
      * Выполнить запрос в социальную сеть и получить данные пользователей.
      * @param users Список запрашиваемых пользователей.
-     * @param fields Запрашиваемые поля. Если `null`, используются поля по умолчанию.
-     *               См.: `social.task.IGetUsersTask.fields`
+     * @param fields Запрашиваемые поля. Если `0` - запрашиваются все поля.
      * @param onComplete Колбек завершения запроса.
      * @param onProgress Колбек прогресса загрузки.
      * @param priority Приоритет запроса. Используется для ограничения количества
@@ -121,7 +120,7 @@ interface INetworkClient extends INetwork
      * @return Новый экземпляр созданной задачи для её контроля и отслеживания.
      */
     public function getUsers(   users:Array<User>,
-                                fields:UserFields = null,
+                                fields:UserFields = 0,
                                 onComplete:IGetUsersTask->Void = null,
                                 onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
                                 priority:Int = 0

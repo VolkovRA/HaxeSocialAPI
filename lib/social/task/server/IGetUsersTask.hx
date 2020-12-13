@@ -36,19 +36,13 @@ interface IGetUsersTask extends ITask<IGetUsersTask, INetworkServer>
 
     /**
      * Маска запрашиваемых данных.  
-     * Используется для запроса только необходимых данных.
+     * Полезно для запроса только конкретных данных.
      * 
      * **Обратите внимание**  
-     * Если какой-то флаг не указан, то соответствующие ему данные не будут
-     * получены, даже если они придут в ответе от социальной сети.
+     * Если какой-то флаг не указан, то соответствующие ему данные не
+     * будут получены, даже если они придут в ответе от социальной сети.
      * 
-     * По умолчанию запрашиваются:
-     * - `social.user.UserField.FIRST_NAME` Имя пользователя.
-     * - `social.user.UserField.LAST_NAME`  Фамилия пользователя.
-     * - `social.user.UserField.AVATAR_100` Аватарка **100x100**.
-     * - `social.user.UserField.DELETED`    Статус отсутствия пользователя.
-     * 
-     * По умолчанию: `UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED`
+     * По умолчанию: `0` *(Запросить все данные)*
      */
     public var fields(default, null):UserFields;
 

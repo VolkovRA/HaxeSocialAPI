@@ -14,7 +14,7 @@ import social.target.ok.objects.IFrameParams;
 import social.target.ok.sdk.SDK;
 import social.target.ok.task.client.InviteTask;
 import social.target.ok.task.client.PostTask;
-//import social.target.ok.task.client.GetUsersTask;
+import social.target.ok.task.client.GetUsersTask;
 import social.target.ok.task.client.GetFriendsTask;
 import social.user.User;
 import social.user.UserField;
@@ -165,25 +165,20 @@ class OdnoklassnikiClient extends Odnoklassniki implements INetworkClient
     }
 
     public function getUsers(   users:Array<User>,
-                                fields:UserFields = null,
+                                fields:UserFields = 0,
                                 onComplete:IGetUsersTask->Void = null,
                                 onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
                                 priority:Int = 0
     ):IGetUsersTask {
-
-        /*
         var task:IGetUsersTask  = new GetUsersTask(this);
         task.users              = users;
         task.token              = token;
-        task.fields             = fields == null ? task.fields : fields;
+        task.fields             = fields;
         task.onComplete         = onComplete;
         task.onProgress         = onProgress;
         task.priority           = priority;
         task.start();
         return task;
-        */
-
-        return null;
     }
 
     public function getFriends( user:UserID,

@@ -200,4 +200,36 @@ class NativeJS
     public static inline function parseJSON(str:String):Dynamic {
         return Syntax.code('JSON.parse({0})', str);
     }
+
+    /**
+     * Вывести все ключи мапы.  
+     * Печатает все ключи в мапе одной строкой и разделяет их
+     * символом `sep`.
+     * 
+     * Пример:
+     * ```
+     * var map = {"dog":1, "cat":true, "23":null};
+     * trace(mapKeys(map, ",")); // dog,cat,23
+     * ```
+     * 
+     * @param map Хеш-мапа.
+     * @param sep Символ разделителя.
+     * @return Строка с всеми ключами мапы перечисленных через запятую.
+     */
+    public static function mapKeys(map:Dynamic, sep:String):String {
+        var str:String = '';
+        Syntax.code('for (var key in {0}) {1} += key + ","', map, str);
+        return str==''?'':str.substring(0,str.length-1);
+    }
+
+    /**
+     * Получить первый элемент в мапе.  
+     * Возвращает самый первый элемент мапы.
+     * @param map Хеш-мапа.
+     * @return Первый элемент в мапе.
+     */
+    public static function map0(map:Dynamic):Dynamic {
+        Syntax.code("for (var key in {0}) return {0}[key];", map);
+        return null;
+    }
 }

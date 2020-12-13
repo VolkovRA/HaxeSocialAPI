@@ -1,13 +1,13 @@
 package social.target.ok;
 
 import social.network.IParser;
+import social.target.ok.objects.IFrameParams;
+import social.task.client.IInviteTask;
+import social.task.client.IPostTask;
 import social.user.OnlineType;
 import social.user.Sex;
 import social.user.User;
 import social.user.UserField;
-import social.target.ok.objects.IFrameParams;
-import social.task.client.IInviteTask;
-import social.task.client.IPostTask;
 import social.utils.NativeJS;
 import social.utils.Tools;
 
@@ -17,6 +17,14 @@ import social.utils.Tools;
 @:dce
 class Parser implements IParser
 {
+    /**
+     * Время юзера в онлайне после последней активности в сети. (mc)  
+     * Это количество миллисекунд, которые пользователь будет считаться
+     * в онлайне после последней активности в сети. Используется для
+     * определения статуса онлайна пользователя.
+     */
+    static private inline var USER_ONLINE_TIMEOUT:Float = 1 * 60 * 1000;
+
     /**
      * Создать парсер OK.
      */
@@ -30,7 +38,6 @@ class Parser implements IParser
     ///////////////////
 
     public function readUser(data:Dynamic, user:User, fields:UserFields):Void {
-        /*
         if (data == null) {
             if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))      user.firstName = null;
             if (NativeJS.flagsOR(fields, UserField.LAST_NAME))       user.lastName = null;
@@ -44,68 +51,83 @@ class Parser implements IParser
             if (NativeJS.flagsOR(fields, UserField.ONLINE))          user.online = null;
         }
         else {
-            if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))      user.firstName = data.first_name;
-            if (NativeJS.flagsOR(fields, UserField.LAST_NAME))       user.lastName = data.last_name;
+            if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))      user.firstName = readUserFirstName(data);
+            if (NativeJS.flagsOR(fields, UserField.LAST_NAME))       user.lastName = readUserLastName(data);
             if (NativeJS.flagsOR(fields, UserField.DELETED))         user.deleted = readUserDeleted(data);
             if (NativeJS.flagsOR(fields, UserField.BANNED))          user.banned = readUserBanned(data);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_50))       user.avatar50 = readUserPhoto(data.photo_50);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_100))      user.avatar100 = readUserPhoto(data.photo_100);
-            if (NativeJS.flagsOR(fields, UserField.AVATAR_200))      user.avatar200 = readUserPhoto(data.photo_200);
-            if (NativeJS.flagsOR(fields, UserField.HOME))            user.home = readHome(data.domain);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_50))       user.avatar50 = readUserPhoto50(data);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_100))      user.avatar100 = readUserPhoto100(data);
+            if (NativeJS.flagsOR(fields, UserField.AVATAR_200))      user.avatar200 = readUserPhoto200(data);
+            if (NativeJS.flagsOR(fields, UserField.HOME))            user.home = readUserHome(data);
             if (NativeJS.flagsOR(fields, UserField.SEX))             user.sex = readUserSex(data);
             if (NativeJS.flagsOR(fields, UserField.ONLINE))          user.online = readUserOnline(data);
         }
-        */
         user.dateUpdated = NativeJS.stamp();
     }
 
-    public function readUserOnline(data:Dynamic):OnlineType {
-        /*
-        if (data.online > 0) {
-            if (data.online_mobile > 0)
-                return OnlineType.ONLINE_MOBILE;
-            else
-                return OnlineType.ONLINE;
-        }
-        */
-        return OnlineType.OFFLINE;
+    public function readUserFirstName(data:Dynamic):String {
+        if (data.first_name == null)    return null;
+        if (data.first_name == "")      return null;
+        return NativeJS.str(data.first_name);
     }
 
-    public function readUserPhoto(data:Dynamic):String {
-        var str = NativeJS.str(data);
-        /*
-        // Невалидные данные:
-        if (str.indexOf("vk.com/images/deactivated") != -1) return null;    // https://vk.com/images/deactivated_50.png
-        if (str.indexOf("vk.com/images/camera") != -1) return null;         // https://vk.com/images/camera_50.png?ava=1
-        */
-        return str;
-    }
-
-    public function readHome(data:Dynamic):String {
-        return "https://ok.ru/profile/" + NativeJS.str(data);
-    }
-
-    public function readUserBanned(data:Dynamic):Bool {
-        //if (data.deactivated == 'banned')
-        //    return true;
-
-        return false;
+    public function readUserLastName(data:Dynamic):String {
+        if (data.last_name == null)     return null;
+        if (data.last_name == "")       return null;
+        return NativeJS.str(data.last_name);
     }
 
     public function readUserDeleted(data:Dynamic):Bool {
-        //if (data.deactivated == 'deleted')
-        //    return true;
-
         return false;
     }
 
-    public function readUserSex(data:Dynamic):Sex {
-        //if (data.sex == 1)
-        //    return Sex.FEMALE;
-        //if (data.sex == 2)
-        //    return Sex.MALE;
+    public function readUserBanned(data:Dynamic):Bool {
+        // todo: Протестить на забаненном юзере!
+        // Эта функция не тестировалось, так-как не удалось 
+        // найти забаненного юзера в Одноклассниках.
+        // Писал на верочку, по аналогий..
+        if (data.blocked == null)       return false;
+        if (data.blocked == "")         return false;
+        return true;
+    }
 
+    public function readUserPhoto50(data:Dynamic):String {
+        if (data.pic50x50 == null)      return null;
+        if (data.pic50x50 == "")        return null;
+        return NativeJS.str(data.pic50x50);
+    }
+
+    public function readUserPhoto100(data:Dynamic):String {
+        if (data.pic128x128 == null)    return null;
+        if (data.pic128x128 == "")      return null;
+        return NativeJS.str(data.pic128x128);
+    }
+
+    public function readUserPhoto200(data:Dynamic):String {
+        if (data.pic224x224 == null)    return null;
+        if (data.pic224x224 == "")      return null;
+        return NativeJS.str(data.pic224x224);
+    }
+
+    public function readUserHome(data:Dynamic):String {
+        if (data.url_profile == null)   return null;
+        if (data.url_profile == "")     return null;
+        return NativeJS.str(data.url_profile);
+    }
+
+    public function readUserSex(data:Dynamic):Sex {
+        if (data.gender == "male")      return Sex.MALE;
+        if (data.gender == "female")    return Sex.FEMALE;
         return Sex.UNKNOWN;
+    }
+
+    public function readUserOnline(data:Dynamic):OnlineType {
+        if (data.last_online_ms == null)    return OnlineType.OFFLINE;
+        if (data.last_online_ms == "")      return OnlineType.OFFLINE;
+        if (NativeJS.parseInt(data.last_online_ms, 10) + USER_ONLINE_TIMEOUT > NativeJS.stamp())
+            return OnlineType.ONLINE;
+
+        return OnlineType.OFFLINE;
     }
 
     @:keep
@@ -187,8 +209,9 @@ class Parser implements IParser
      * @return Результат вызова в стандартизированном виде.
      */
     public function getInvitedResult(result:String):InviteResult {
-        if (result == "cancel") return InviteResult.CANCELED;
-        if (result == "ok")     return InviteResult.ACCEPTED;
+        if (result == null)                     return InviteResult.UNKNOWN;
+        if (result.toLowerCase() == "cancel")   return InviteResult.CANCELED;
+        if (result.toLowerCase() == "ok")       return InviteResult.ACCEPTED;
         return InviteResult.UNKNOWN;
     }
 
@@ -198,7 +221,7 @@ class Parser implements IParser
      * @return Список приглашённых.
      */
     public function getInvitedResultUsers(result:String):Array<UserID> {
-        if (result == null || result == "" || result == "null")
+        if (result == null || result == "" || result.toLowerCase() == "null")
             return null;
 
         return result.split(",");
@@ -210,8 +233,9 @@ class Parser implements IParser
      * @return Результат вызова в стандартизированном виде.
      */
     public function getPostResult(result:String):PostResult {
-        if (result == "cancel") return PostResult.CANCELED;
-        if (result == "ok")     return PostResult.ACCEPTED;
+        if (result == null)                     return PostResult.UNKNOWN;
+        if (result.toLowerCase() == "cancel")   return PostResult.CANCELED;
+        if (result.toLowerCase() == "ok")       return PostResult.ACCEPTED;
         return PostResult.UNKNOWN;
     }
 
@@ -221,7 +245,7 @@ class Parser implements IParser
      * @return ID Нового поста.
      */
     public function getPostResultPostID(result:String):String {
-        if (result == null || result == "" || result == "null" || result == "0")
+        if (result == null || result == "" || result.toLowerCase() == "null" || result == "0")
             return null;
 
         return result;
@@ -234,7 +258,7 @@ class Parser implements IParser
      * @return Это ошибка.
      */
     public function isResultDataError(result:String):Bool {
-        if (result == null || result == "" || result == "null" || result == "0" || result == "cancel")
+        if (result == null || result == "" || result.toLowerCase() == "null" || result == "0" || result.toLowerCase() == "cancel")
             return false;
 
         var obj:Dynamic = null;
@@ -261,5 +285,144 @@ class Parser implements IParser
         if (value == "0") return false;
         if (value.toLowerCase() == "false") return false;
         return true;
+    }
+
+    /**
+     * Получить параметр `fields` для указания конкретных, запрашиваемых полей пользователя.
+     * @param fields Запрашиваемые флаги.
+     * @return Список запрашиваемых полей для атрибута: `fields`.
+     * @see users.getInfo: https://apiok.ru/dev/methods/rest/users/users.getInfo
+     */
+    public function getUserFields(fields:UserFields):String {
+        var str = "";
+
+//        return
+//        "ACCESSIBLE," +
+//        "AGE," +
+//        "ALLOWS_ANONYM_ACCESS," +
+//        "ALLOWS_MESSAGING_ONLY_FOR_FRIENDS," +
+//        "ALLOW_ADD_TO_FRIEND," +
+//        "BECOME_VIP_ALLOWED," +
+//        "BIRTHDAY," +
+//        "BLOCKED," +
+//        "BLOCKS," +
+//        "BUSINESS," +
+//        "CAN_USE_REFERRAL_INVITE," +
+//        "CAN_VCALL," +
+//        "CAN_VMAIL," +
+//        "CITY_OF_BIRTH," +
+//        "CLOSE_COMMENTS_ALLOWED," +
+//        "COMMON_FRIENDS_COUNT," +
+//        "CURRENT_LOCATION," +
+//        "CURRENT_STATUS," +
+//        "CURRENT_STATUS_DATE," +
+//        "CURRENT_STATUS_DATE_MS," +
+//        "CURRENT_STATUS_ID," +
+//        "CURRENT_STATUS_MOOD," +
+//        "CURRENT_STATUS_TRACK_ID," +
+//        "EMAIL," +
+//        "EXECUTOR," +
+//        "FIRST_NAME," +
+//        "FIRST_NAME_INSTRUMENTAL," +
+//        "FOLLOWERS_COUNT," +
+//        "FORBIDS_MENTIONING," +
+//        "FRIEND," +
+//        "FRIENDS_COUNT," +
+//        "FRIEND_INVITATION," +
+//        "FRIEND_INVITE_ALLOWED," +
+//        "GENDER," +
+//        "GROUP_INVITE_ALLOWED," +
+//        "HAS_DAILY_PHOTO," +
+//        "HAS_EMAIL," +
+//        "HAS_GROUPS_TO_COMMENT," +
+//        "HAS_PHONE," +
+//        "HAS_PRODUCTS," +
+//        "HAS_SERVICE_INVISIBLE," +
+//        "INTERNAL_PIC_ALLOW_EMPTY," +
+//        "INVITED_BY_FRIEND," +
+//        "IS_MERCHANT," +
+//        "LAST_NAME," +
+//        "LAST_NAME_INSTRUMENTAL," +
+//        "LAST_ONLINE," +
+//        "LAST_ONLINE_MS," +
+//        "LOCALE," +
+//        "LOCATION," +
+//        "LOCATION_OF_BIRTH," +
+//        "MODIFIED_MS," +
+//        "NAME," +
+//        "NAME_INSTRUMENTAL," +
+//        "ODKL_BLOCK_REASON," +
+//        "ODKL_EMAIL," +
+//        "ODKL_LOGIN," +
+//        "ODKL_MOBILE," +
+//        "ODKL_MOBILE_ACTIVATION_DATE," +
+//        "ODKL_MOBILE_STATUS," +
+//        "ODKL_USER_OPTIONS," +
+//        "ODKL_USER_STATUS," +
+//        "ODKL_VOTING," +
+//        "ONLINE," +
+//        "PHOTO_ID," +
+//        "PIC1024X768," +
+//        "PIC128MAX," +
+//        "PIC128X128," +
+//        "PIC180MIN," +
+//        "PIC190X190," +
+//        "PIC224X224," +
+//        "PIC240MIN," +
+//        "PIC288X288," +
+//        "PIC320MIN," +
+//        "PIC50X50," +
+//        "PIC600X600," +
+//        "PIC640X480," +
+//        "PIC_1," +
+//        "PIC_2," +
+//        "PIC_3," +
+//        "PIC_4," +
+//        "PIC_5," +
+//        "PIC_BASE," +
+//        "PIC_FULL," +
+//        "PIC_MAX," +
+//        "POSSIBLE_RELATIONS," +
+//        "PREMIUM," +
+//        "PRESENTS," +
+//        "PRIVATE," +
+//        "PROFILE_BUTTONS," +
+//        "PROFILE_COVER," +
+//        "PROFILE_PHOTO_SUGGEST_ALLOWED," +
+//        "PYMK_PIC224X224," +
+//        "PYMK_PIC288X288," +
+//        "PYMK_PIC600X600," +
+//        "PYMK_PIC_FULL," +
+//        "REF," +
+//        "REGISTERED_DATE," +
+//        "REGISTERED_DATE_MS," +
+//        "RELATIONS," +
+//        "RELATIONSHIP," +
+//        "SEND_MESSAGE_ALLOWED," +
+//        "SHORTNAME," +
+//        "SHOW_LOCK," +
+//        "STATUS," +
+//        "UID," +
+//        "URL_CHAT," +
+//        "URL_CHAT_MOBILE," +
+//        "URL_PROFILE," +
+//        "URL_PROFILE_MOBILE," +
+//        "VIP";
+
+        if (NativeJS.flagsOR(fields, UserField.FIRST_NAME))     str += "FIRST_NAME,";
+        if (NativeJS.flagsOR(fields, UserField.LAST_NAME))      str += "LAST_NAME,";
+        //if (NativeJS.flagsOR(fields, UserField.DELETED))      // Поля не существует, если нет юзера - он не возвращает
+        if (NativeJS.flagsOR(fields, UserField.BANNED))         str += "BLOCKED,";
+        if (NativeJS.flagsOR(fields, UserField.AVATAR_50))      str += "PIC50X50,";
+        if (NativeJS.flagsOR(fields, UserField.AVATAR_100))     str += "PIC128X128,";
+        if (NativeJS.flagsOR(fields, UserField.AVATAR_200))     str += "PIC224X224,";
+        if (NativeJS.flagsOR(fields, UserField.HOME))           str += "URL_PROFILE,";
+        if (NativeJS.flagsOR(fields, UserField.SEX))            str += "GENDER,";
+        if (NativeJS.flagsOR(fields, UserField.ONLINE))         str += "LAST_ONLINE_MS,";
+
+        if (str == '')
+            return str;
+
+        return str.substring(0, str.length - 1);
     }
 }

@@ -58,7 +58,7 @@ class Client
                 { id:"551229537" },     // Забаненный
                 { id:"1" },             // Павел Дуров
                 { id:"5513242495" },    // Несуществующий
-            ], null, function(task) {
+            ], 0, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;
@@ -117,12 +117,14 @@ class Client
         bt2.textContent = "Получить данные юзеров";
         bt2.onclick = function(){
             client.getUsers([
-                { id:"98" },            // Удалённый
-                { id:"1718726" },       // Закрытый (Приватный)
-                { id:"551229537" },     // Забаненный
-                { id:"1" },             // Павел Дуров
-                { id:"5513242495" },    // Несуществующий
-            ], null, function(task) {
+                { id:"573142931630" },
+                { id:"578879458476" },
+                { id:"519215001788" },
+                { id:"450551847336" },
+                { id:"582563146675" },
+                { id:"338981885027" },
+                { id:"561966037504" },
+            ], 0, function(task) {
                 if (task.error != null) {
                     trace(task.error);
                     return;

@@ -2,8 +2,8 @@ package social.target.ok;
 
 import haxe.ds.IntMap;
 import loader.Balancer;
-import social.target.ok.enums.ErrorCode;
 import social.network.INetwork;
+import social.target.ok.enums.ErrorCode;
 import social.utils.Capabilities;
 
 /**

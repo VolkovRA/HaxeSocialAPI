@@ -12,11 +12,11 @@ import social.target.vk.objects.BaseError;
 import social.user.User;
 import social.user.UserField;
 import social.utils.ErrorMessages;
+import social.utils.NativeJS;
 import social.utils.Tools;
 
 /**
  * Реализация запроса данных пользователей.
- * Может быть использован на клиенте и на сервере.
  */
 @:dce
 class GetUsersTask implements IGetUsersTask 
@@ -33,8 +33,8 @@ class GetUsersTask implements IGetUsersTask
     public var network(default, null):INetworkClient    = null;
     public var token(default, null):String              = null;
     public var users(default, null):Array<User>         = null;
-    public var fields(default, null):UserFields         = UserField.FIRST_NAME | UserField.LAST_NAME | UserField.AVATAR_100 | UserField.DELETED;
     public var error(default, null):Error               = null;
+    public var fields(default, null):UserFields         = 0;
     public var repeats(default, null):Int               = 0;
     public var priority(default, null):Int              = 0;
     public var isComplete(default, null):Bool           = false;
@@ -76,13 +76,13 @@ class GetUsersTask implements IGetUsersTask
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:
-        var fds = parser.getUserFields(fields);
+        var fds = parser.getUserFields(fields==0?Tools.getAllUserFields():fields);
         i = 0;
         len = maps.length;
         loaders = new Array();
         while (i < len) {
             var req = new Request(network.apiURL + "users.get");
-            req.data =  "user_ids=" + getUsersIDS(maps[i]) + 
+            req.data =  "user_ids=" + NativeJS.mapKeys(maps[i], ",") + 
                         (fds==''?'':("&fields=" + fds)) +
                         "&v=" + network.apiVersion +
                         "&access_token=" + token;
@@ -121,6 +121,7 @@ class GetUsersTask implements IGetUsersTask
 
     private function onResponse(lr:ILoader):Void {
         var info:LoaderInfo = lr.userData;
+        var ff = fields==0?Tools.getAllUserFields():fields;
 
         // Разбор ответа
         // Сетевая ошибка или некорректный формат ответ:
@@ -156,7 +157,7 @@ class GetUsersTask implements IGetUsersTask
                 // При запросе только 1 пользователя, если он не существует - возвращает эту ошибку.
                 // При запросе нескольких пользователей возвращает просто пустой ответ без ошибки.
                 // По сути, это не ошибка, просто пользователя не существует!
-                network.parser.readUser(null, getFirstMapItem(info.users), fields);
+                network.parser.readUser(null, NativeJS.map0(info.users), ff);
                 info.complete = true;
                 checkComplete();
                 return;
@@ -183,13 +184,13 @@ class GetUsersTask implements IGetUsersTask
                 var item = arr[len];
                 var user = info.users[item.id];
                 received[user.id] = true;
-                network.parser.readUser(item, user, fields);
+                network.parser.readUser(item, user, ff);
             }
 
             // Тех, кого VK не вернул - удалены или не существуют:
             var id:UserID = null;
             Syntax.code('for ({0} in {1}) {', id, info.users); // for start
-                if (!received[id]) network.parser.readUser(null, info.users[id], fields);
+                if (!received[id]) network.parser.readUser(null, info.users[id], ff);
             Syntax.code('}'); // for end
         }
         catch (err:Dynamic) {
@@ -220,17 +221,6 @@ class GetUsersTask implements IGetUsersTask
         cancel();
         if (onComplete != null)
             onComplete(this);
-    }
-
-    static private function getUsersIDS(map:DynamicAccess<User>):String {
-        var str:String = '';
-        Syntax.code('for (var key in {0}) {1} += key + ","', map, str); // for in
-        return str==''?'':str.substring(0,str.length-1);
-    }
-
-    static private function getFirstMapItem(map:DynamicAccess<User>):User {
-        Syntax.code("for (var key in {0}) return {0}[key];", map);
-        return null;
     }
 
     @:keep

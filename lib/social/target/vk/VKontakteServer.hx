@@ -38,7 +38,7 @@ class VKontakteServer extends VKontakte implements INetworkServer
     public var serviceKey:String = null;
 
     public function getUsers(   users:Array<User>,
-                                fields:UserFields = null,
+                                fields:UserFields = 0,
                                 onComplete:IGetUsersTask->Void = null,
                                 onProgress:IGetUsersTask->DynamicAccess<User>->Void = null,
                                 priority:Int = 0
@@ -46,7 +46,7 @@ class VKontakteServer extends VKontakte implements INetworkServer
         var task:IGetUsersTask  = new GetUsersTask(this);
         task.token              = serviceKey;
         task.users              = users;
-        task.fields             = fields == null ? task.fields : fields;
+        task.fields             = fields;
         task.onComplete         = onComplete;
         task.onProgress         = onProgress;
         task.priority           = priority;

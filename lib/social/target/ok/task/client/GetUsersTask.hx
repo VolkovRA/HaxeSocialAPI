@@ -1,14 +1,14 @@
-package social.target.vk.task.server;
+package social.target.ok.task.client;
 
 import haxe.DynamicAccess;
 import js.Syntax;
 import js.lib.Error;
+import loader.DataFormat;
 import loader.ILoader;
 import loader.Request;
-import social.network.INetworkServer;
-import social.task.server.IGetUsersTask;
-import social.target.vk.enums.ErrorCode;
-import social.target.vk.objects.BaseError;
+import social.network.INetworkClient;
+import social.target.ok.objects.BaseError;
+import social.task.client.IGetUsersTask;
 import social.user.User;
 import social.user.UserField;
 import social.utils.ErrorMessages;
@@ -25,16 +25,16 @@ class GetUsersTask implements IGetUsersTask
      * Создать задачу.
      * @param network Реализация интерфейса социальной сети.
      */
-    public function new(network:INetworkServer) {
+    public function new(network:INetworkClient) {
         this.network = network;
         this.repeats = network.repeats;
     }
 
-    public var network(default, null):INetworkServer    = null;
+    public var network(default, null):INetworkClient    = null;
     public var token(default, null):String              = null;
     public var users(default, null):Array<User>         = null;
-    public var error(default, null):Error               = null;
     public var fields(default, null):UserFields         = 0;
+    public var error(default, null):Error               = null;
     public var repeats(default, null):Int               = 0;
     public var priority(default, null):Int              = 0;
     public var isComplete(default, null):Bool           = false;
@@ -44,7 +44,7 @@ class GetUsersTask implements IGetUsersTask
     private var loaders:Array<ILoader>                  = null;
 
     public function start():Void {
-        var parser:Parser = untyped network.parser;
+        var net:OdnoklassnikiClient = untyped network;
         var len = users.length;
         if (len == 0) {
             var f1 = onProgress;
@@ -76,16 +76,16 @@ class GetUsersTask implements IGetUsersTask
             maps.resize(maps.length - 1);
 
         // Инициируем запросы:
-        var fds = parser.getUserFields(fields==0?Tools.getAllUserFields():fields);
         i = 0;
         len = maps.length;
         loaders = new Array();
         while (i < len) {
-            var req = new Request(network.apiURL + "users.get");
-            req.data =  "user_ids=" + NativeJS.mapKeys(maps[i], ",") + 
-                        (fds==''?'':("&fields=" + fds)) +
-                        "&v=" + network.apiVersion +
-                        "&access_token=" + token;
+            var req = new Request(network.apiURL + "users/getInfo");
+            req.data =  "uids=" + NativeJS.mapKeys(maps[i], ",") + 
+                        "&fields=" + net.parser.getUserFields(fields==0?Tools.getAllUserFields():fields) +
+                        "&emptyPictures=true" +
+                        "&application_key=" + net.applicationKey +
+                        "&session_key=" + net.token;
 
             var info:LoaderInfo = { 
                 complete:false, 
@@ -94,7 +94,8 @@ class GetUsersTask implements IGetUsersTask
                 users:maps[i],
             };
 
-            loaders[i] = new loader.nodejs.LoaderNodeJS();
+            loaders[i] = #if nodejs null; #else new loader.xhr.LoaderXHR(); #end
+            loaders[i].dataFormat = DataFormat.JSON;
             loaders[i].priority = priority;
             loaders[i].balancer = network.balancer;
             loaders[i].onComplete = onResponse;
@@ -130,7 +131,7 @@ class GetUsersTask implements IGetUsersTask
                 lr.load(info.req);
                 return;
             }
-            error = new Error(Tools.msg(ErrorMessages.REQUEST_ERROR, [network.apiURL + "users.get", Tools.err(lr.error)]));
+            error = new Error(Tools.msg(ErrorMessages.REQUEST_ERROR, [network.apiURL + "users/getInfo", Tools.err(lr.error)]));
             info.complete = true;
             checkComplete();
             return;
@@ -142,33 +143,20 @@ class GetUsersTask implements IGetUsersTask
                 lr.load(info.req);
                 return;
             }
-            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, [network.apiURL + "users.get"]));
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_EMPTY, [network.apiURL + "users/getInfo"]));
             info.complete = true;
             checkComplete();
             return;
         }
 
         // Ошибки API:
-        var errors:BaseError = lr.data.error;
-        if (errors != null) {
-
-            // 113 - Частный случай НЕ ошибки:
-            if (errors.error_code == ErrorCode.WRONG_USER_ID) {
-                // При запросе только 1 пользователя, если он не существует - возвращает эту ошибку.
-                // При запросе нескольких пользователей возвращает просто пустой ответ без ошибки.
-                // По сути, это не ошибка, просто пользователя не существует!
-                network.parser.readUser(null, NativeJS.map0(info.users), ff);
-                info.complete = true;
-                checkComplete();
-                return;
-            }
-
-            // Остальные:
+        var errors:BaseError = lr.data;
+        if (errors.error_code != null) {
             if (info.r++ < repeats && !network.apiFatalErrors.get(errors.error_code)) {
                 lr.load(info.req);
             }
             else {
-                error = new Error(Tools.msg(ErrorMessages.RESPONSE_ERROR, [network.apiURL + "users.get", errors.error_code, errors.error_msg]));
+                error = new Error(Tools.msg(ErrorMessages.RESPONSE_ERROR, [network.apiURL + "users/getInfo", errors.error_code, errors.error_msg]));
                 info.complete = true;
                 checkComplete();
             }
@@ -177,17 +165,17 @@ class GetUsersTask implements IGetUsersTask
 
         // Ожидаем массив с объектами:
         try {
-            var arr:Array<Dynamic> = lr.data.response;
+            var arr:Array<Dynamic> = lr.data;
             var len = arr.length;
             var received = new DynamicAccess<Bool>();
             while (len-- > 0) {
                 var item = arr[len];
-                var user = info.users[item.id];
+                var user = info.users[item.uid];
                 received[user.id] = true;
                 network.parser.readUser(item, user, ff);
             }
 
-            // Тех, кого VK не вернул - удалены или не существуют:
+            // Тех, кого OK не вернул - удалены или не существуют:
             var id:UserID = null;
             Syntax.code('for ({0} in {1}) {', id, info.users); // for start
                 if (!received[id]) network.parser.readUser(null, info.users[id], ff);
@@ -198,7 +186,7 @@ class GetUsersTask implements IGetUsersTask
                 lr.load(info.req);
                 return;
             }
-            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, [network.apiURL + "users.get", Tools.err(err)]));
+            error = new Error(Tools.msg(ErrorMessages.RESPONSE_WRONG, [network.apiURL + "users/getInfo", Tools.err(err)]));
             info.complete = true;
             checkComplete();
             return;
